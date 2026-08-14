@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import { fireEvent } from '@testing-library/react';
+import { getAuthenticatedUser } from '@edx/frontend-platform/auth';
 import noCourseImg from '@src/assets/images/no-course-image.svg';
 
 import {
@@ -14,6 +15,12 @@ let mockIsEnrolled: boolean | undefined;
 
 jest.mock('@edx/frontend-platform', () => ({
   getConfig: jest.fn(() => ({ SITE_NAME: 'Example Site', LMS_BASE_URL: 'http://example.com' })),
+}));
+
+// The embedded course About body renders CourseOverview, which reads the
+// authenticated user to decide whether to show the Studio edit action.
+jest.mock('@edx/frontend-platform/auth', () => ({
+  getAuthenticatedUser: jest.fn(() => null),
 }));
 
 jest.mock('./data', () => {
@@ -257,22 +264,22 @@ describe('PathwayDetailPage', () => {
     const secondCourse = secondCourseTrigger.closest('.collapsible-card') as HTMLElement;
     expect(firstCourseTrigger).toHaveAttribute('aria-expanded', 'false');
     expect(secondCourseTrigger).toHaveAttribute('aria-expanded', 'false');
-    expect(within(firstCourse).queryByText(courses[0].description)).not.toBeInTheDocument();
+    expect(within(firstCourse).queryByText(courses[0].courseAboutData.shortDescription)).not.toBeInTheDocument();
 
     // Opening one course mounts only its body.
     await userEvent.click(firstCourseTrigger);
     expect(firstCourseTrigger).toHaveAttribute('aria-expanded', 'true');
     expect(secondCourseTrigger).toHaveAttribute('aria-expanded', 'false');
-    expect(within(firstCourse).getByText(courses[0].description)).toBeVisible();
-    expect(within(firstCourse).getByRole('button', { name: messages.learnMoreBtn.defaultMessage })).toBeDisabled();
-    expect(within(secondCourse).queryByText(courses[1].description)).not.toBeInTheDocument();
+    expect(within(firstCourse).getByText(courses[0].courseAboutData.shortDescription)).toBeVisible();
+    expect(within(firstCourse).getByRole('button', { name: messages.learnMoreBtn.defaultMessage })).toBeEnabled();
+    expect(within(secondCourse).queryByText(courses[1].courseAboutData.shortDescription)).not.toBeInTheDocument();
 
     // Opening a second course keeps the first open.
     await userEvent.click(secondCourseTrigger);
     expect(firstCourseTrigger).toHaveAttribute('aria-expanded', 'true');
     expect(secondCourseTrigger).toHaveAttribute('aria-expanded', 'true');
-    expect(within(firstCourse).getByText(courses[0].description)).toBeVisible();
-    expect(within(secondCourse).getByText(courses[1].description)).toBeVisible();
+    expect(within(firstCourse).getByText(courses[0].courseAboutData.shortDescription)).toBeVisible();
+    expect(within(secondCourse).getByText(courses[1].courseAboutData.shortDescription)).toBeVisible();
 
     // FAQs open independently of each other and stay open together.
     const firstFaqTrigger = within(faqsSection).getByRole('button', { name: faqs[0].question });
@@ -289,6 +296,155 @@ describe('PathwayDetailPage', () => {
     expect(secondFaqTrigger).toHaveAttribute('aria-expanded', 'true');
     expect(within(firstFaq).getByText(faqs[0].answer)).toBeVisible();
     expect(within(secondFaq).getByText(faqs[1].answer)).toBeVisible();
+  });
+
+  it('embeds a complete CourseAboutData in every fixture course', () => {
+    DATA_ENGINEERING_PATHWAY.courses.forEach((course) => {
+      const { courseAboutData } = course;
+      expect(courseAboutData.id).toBe(course.id);
+      expect(courseAboutData.name).toBe(course.title);
+      expect(courseAboutData.shortDescription).toBeTruthy();
+      // Trusted static fixture HTML only: the overview renders through
+      // dangerouslySetInnerHTML and must be built-in copy, never user input.
+      expect(courseAboutData.overview).toContain('<p>');
+      expect(courseAboutData.overview).not.toMatch(/\{\{|\$\{/);
+      // Structured overview sections rendered by the About card.
+      ['About This Course', 'Requirements', 'Frequently Asked Questions'].forEach((heading) => {
+        expect(courseAboutData.overview).toContain(heading);
+      });
+      expect(courseAboutData.enrollment).toEqual({ mode: null, isActive: false });
+      expect(courseAboutData.media).toEqual({
+        courseImage: { uri: null },
+        courseVideo: { uri: null },
+        image: { raw: '', small: '', large: '' },
+      });
+      expect(courseAboutData.coursePrice).toBe('Free');
+      expect(courseAboutData.displayOrgWithDefault).toBe('MIT OpenLearning');
+      expect(courseAboutData.displayNumberWithDefault).toBe('1234');
+    });
+
+    // Only the Capstone fixture is intentionally longer (so the modal body
+    // scrolls during manual checks); every other course keeps the identical
+    // shared default overview.
+    const capstone = DATA_ENGINEERING_PATHWAY.courses.find(
+      ({ title }) => title === 'Capstone: Build a Data Platform',
+    );
+    const others = DATA_ENGINEERING_PATHWAY.courses.filter((course) => course !== capstone);
+    expect(new Set(others.map(({ courseAboutData }) => courseAboutData.overview)).size).toBe(1);
+    expect(capstone?.courseAboutData.overview.length).toBeGreaterThan(
+      Math.max(...others.map(({ courseAboutData }) => courseAboutData.overview.length)),
+    );
+  });
+
+  describe('course modal', () => {
+    const getDialog = (courseTitle: string) => (
+      screen.getByRole('dialog', { name: `Learn more about ${courseTitle}` })
+    );
+
+    const openModal = async (courseIndex = 0) => {
+      renderPathwayDetailPage();
+      const course = DATA_ENGINEERING_PATHWAY.courses[courseIndex];
+      const aboutSection = getSection(messages.aboutHeading.defaultMessage);
+      const trigger = within(aboutSection).getByRole('button', {
+        name: (name) => name.includes(course.title),
+      });
+      await userEvent.click(trigger);
+      const collapsible = trigger.closest('.collapsible-card') as HTMLElement;
+      await userEvent.click(
+        within(collapsible).getByRole('button', { name: messages.learnMoreBtn.defaultMessage }),
+      );
+      return getDialog(course.title);
+    };
+
+    it('opens a dialog with the selected course\'s embedded About content', async () => {
+      const course = DATA_ENGINEERING_PATHWAY.courses[0];
+      const dialog = await openModal();
+
+      expect(dialog).toBeInTheDocument();
+      expect(within(dialog).getByRole('heading', { level: 1, name: course.title })).toBeInTheDocument();
+      // The intro section and the overview's first paragraph share the fixture
+      // lorem copy, so assert the shared text is present without a unique match.
+      expect(within(dialog).getAllByText(course.courseAboutData.shortDescription).length).toBeGreaterThanOrEqual(1);
+      // Overview HTML is specific to the fixture (not the short description).
+      expect(within(dialog).getByText(/Duis aute irure/)).toBeInTheDocument();
+      // Sidebar renders from the embedded dummy data.
+      expect(within(dialog).getByText(course.courseAboutData.coursePrice)).toBeInTheDocument();
+    });
+
+    it('shows the pathway context banner with the pathway name bold', async () => {
+      const dialog = await openModal();
+      const { name: pathwayName } = DATA_ENGINEERING_PATHWAY;
+
+      // The banner title renders as a non-heading element (compact bar).
+      const banner = within(dialog).getByText(
+        (_, element) => element?.tagName === 'P'
+          && element.textContent === `This course is a part of the ${pathwayName} pathway.`,
+      );
+      const boldPathwayName = within(banner).getByText(pathwayName);
+      expect(boldPathwayName.tagName).toBe('STRONG');
+    });
+
+    it('renders the structured overview card with About, Requirements, and FAQ headings', async () => {
+      const dialog = await openModal();
+
+      const overviewCard = within(dialog)
+        .getByRole('heading', { level: 2, name: 'About This Course' })
+        .closest('.pgn__card') as HTMLElement;
+      expect(within(overviewCard).getByRole('heading', { level: 2, name: 'Requirements' })).toBeInTheDocument();
+      expect(within(overviewCard).getByRole('heading', { level: 2, name: 'Frequently Asked Questions' }))
+        .toBeInTheDocument();
+    });
+
+    it('renders the fixture course number and organization in the dialog', async () => {
+      const course = DATA_ENGINEERING_PATHWAY.courses[0];
+      const dialog = await openModal();
+
+      expect(within(dialog).getByText(course.courseAboutData.displayNumberWithDefault)).toBeInTheDocument();
+      expect(within(dialog).getByText(course.courseAboutData.displayOrgWithDefault)).toBeInTheDocument();
+    });
+
+    it('renders no enrollment or view-course actions inside the dialog', async () => {
+      const dialog = await openModal();
+
+      expect(within(dialog).queryByRole('button', { name: /enroll/i })).not.toBeInTheDocument();
+      expect(within(dialog).queryByRole('button', { name: /view course/i })).not.toBeInTheDocument();
+      // hideActions removes the intro action footer entirely.
+      expect(dialog.querySelector('.card-footer')).not.toBeInTheDocument();
+    });
+
+    it('does not call getAuthenticatedUser when rendering the modal', async () => {
+      (getAuthenticatedUser as jest.Mock).mockClear();
+      const dialog = await openModal();
+
+      expect(dialog).toBeInTheDocument();
+      expect(getAuthenticatedUser).not.toHaveBeenCalled();
+    });
+
+    it('closes via the close button and Escape without changing the URL', async () => {
+      const course = DATA_ENGINEERING_PATHWAY.courses[0];
+      const dialog = await openModal();
+      const { pathname, hash, search } = window.location;
+
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Close' }));
+      expect(screen.queryByRole('dialog', { name: `Learn more about ${course.title}` })).not.toBeInTheDocument();
+      expect(window.location.pathname).toBe(pathname);
+      expect(window.location.hash).toBe(hash);
+      expect(window.location.search).toBe(search);
+
+      // Reopening still works after a close, and Escape closes again.
+      const aboutSection = getSection(messages.aboutHeading.defaultMessage);
+      const collapsible = within(aboutSection)
+        .getByRole('button', { name: (name) => name.includes(course.title) })
+        .closest('.collapsible-card') as HTMLElement;
+      await userEvent.click(within(collapsible).getByRole('button', { name: messages.learnMoreBtn.defaultMessage }));
+      const reopened = getDialog(course.title);
+      expect(reopened).toBeInTheDocument();
+      await userEvent.keyboard('{Escape}');
+      expect(screen.queryByRole('dialog', { name: `Learn more about ${course.title}` })).not.toBeInTheDocument();
+      expect(window.location.pathname).toBe(pathname);
+      expect(window.location.hash).toBe(hash);
+      expect(window.location.search).toBe(search);
+    });
   });
 
   describe('navigation scrollspy', () => {

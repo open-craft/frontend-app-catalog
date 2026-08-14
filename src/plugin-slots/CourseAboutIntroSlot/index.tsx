@@ -2,15 +2,20 @@ import { PluginSlot } from '@openedx/frontend-plugin-framework';
 import type { CourseAboutDataPartial } from '@src/course-about/types';
 import { CourseIntro } from '@src/course-about/course-intro/CourseIntro';
 
-const CourseAboutIntroSlot = ({ courseAboutData }: { courseAboutData: CourseAboutDataPartial }) => (
+interface CourseAboutIntroSlotProps {
+  courseAboutData: CourseAboutDataPartial;
+  hideActions?: boolean;
+}
+
+const CourseAboutIntroSlot = ({ courseAboutData, hideActions = false }: CourseAboutIntroSlotProps) => (
   <PluginSlot
     id="org.openedx.frontend.catalog.course_about_page.intro"
     slotOptions={{
       mergeProps: true,
     }}
-    pluginProps={{ courseAboutData }}
+    pluginProps={{ courseAboutData, hideActions }}
   >
-    <CourseIntro courseAboutData={courseAboutData} />
+    <CourseIntro courseAboutData={courseAboutData} hideActions={hideActions} />
   </PluginSlot>
 );
 

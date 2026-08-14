@@ -6,6 +6,8 @@
 
 This slot is used to replace/modify/hide the entire Course about page intro section.
 
+`pluginProps` include `courseAboutData` and an optional `hideActions` flag (default `false`). When `hideActions` is `true`, the default `CourseIntro` does not render its enrollment/view-course action footer and does not mount any enrollment or authentication hooks. Plugin overrides receive `hideActions` via merged props but may choose to ignore it.
+
 ## Examples
 
 ### Default content

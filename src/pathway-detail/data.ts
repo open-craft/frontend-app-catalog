@@ -1,4 +1,128 @@
+import type { CourseAboutData } from '@src/course-about/types';
 import type { PathwayDetailData } from './types';
+
+/**
+ * Fields shared by every embedded fixture course's CourseAboutData. Per-course
+ * values (id, name, shortDescription, overview) are layered on top by
+ * buildCourseAboutData; all other fields are dummy-but-complete constants, so
+ * the sidebar/media slots render without a missing-field crash.
+ */
+const COURSE_ABOUT_BASE: Omit<CourseAboutData, 'id' | 'name' | 'shortDescription' | 'overview'> = {
+  accessExpiration: null,
+  contentTypeGatingEnabled: false,
+  courseGoals: { selectedGoal: null, weeklyLearningGoalEnabled: false },
+  effort: '4–6 hours per week',
+  end: null,
+  enrollment: { mode: null, isActive: false },
+  enrollmentStart: null,
+  enrollmentEnd: null,
+  entranceExamData: {
+    entranceExamCurrentScore: 0,
+    entranceExamEnabled: false,
+    entranceExamId: '',
+    entranceExamMinimumScorePct: 0,
+    entranceExamPassed: false,
+  },
+  license: 'all-rights-reserved',
+  language: 'English',
+  media: {
+    courseImage: { uri: null },
+    courseVideo: { uri: null },
+    image: { raw: '', small: '', large: '' },
+  },
+  offer: null,
+  relatedPrograms: null,
+  start: '2027-03-03T00:00:00Z',
+  startDisplay: 'Mar 3, 2027',
+  startType: 'timestamp',
+  pacing: 'self',
+  userTimezone: null,
+  showCalculator: false,
+  canAccessProctoredExams: false,
+  notes: { enabled: false, visible: false },
+  marketingUrl: null,
+  celebrations: {
+    firstSection: false,
+    streakLengthToCelebrate: null,
+    streakDiscountEnabled: false,
+    weeklyGoal: false,
+  },
+  userHasPassingGrade: false,
+  courseExitPageIsActive: false,
+  certificateData: {
+    certStatus: 'not available',
+    certWebViewUrl: null,
+    downloadUrl: null,
+    certificateAvailableDate: null,
+  },
+  verifyIdentityUrl: null,
+  verificationStatus: 'none',
+  linkedinAddToProfileUrl: null,
+  isIntegritySignatureEnabled: false,
+  userNeedsIntegritySignature: false,
+  learningAssistantEnabled: false,
+  showCoursewareLink: false,
+  isCourseFull: false,
+  canEnroll: true,
+  invitationOnly: false,
+  isShibCourse: false,
+  allowAnonymous: true,
+  ecommerceCheckout: false,
+  singlePaidMode: {},
+  ecommerceCheckoutLink: null,
+  courseImageUrls: [],
+  startDateIsStillDefault: false,
+  advertisedStart: null,
+  coursePrice: 'Free',
+  preRequisiteCourses: [],
+  aboutSidebarHtml: null,
+  displayNumberWithDefault: '1234',
+  displayOrgWithDefault: 'MIT OpenLearning',
+  ocwLinks: [],
+  prerequisites: [],
+  requirements: '',
+};
+
+/**
+ * Static trusted overview HTML shared by the embedded fixture courses. It is
+ * rendered through the existing dangerouslySetInnerHTML overview path, so it
+ * must stay hard-coded fixture copy and never accept user-controlled content.
+ */
+const COURSE_OVERVIEW_HTML = '<h2>About This Course</h2>'
+  + '<p>'
+  + 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
+  + 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+  + '</p>'
+  + '<h2>Requirements</h2>'
+  + '<p>'
+  + 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. '
+  + 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+  + '</p>'
+  + '<h2>Frequently Asked Questions</h2>'
+  + '<p>'
+  + 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, '
+  + 'eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.'
+  + '</p>';
+
+/** Layers the per-course fields onto the shared dummy base; the overview
+ * defaults to the shared trusted copy. */
+const buildCourseAboutData = ({
+  id,
+  title,
+  shortDescription,
+  overview = COURSE_OVERVIEW_HTML,
+}: {
+  id: string;
+  title: string;
+  shortDescription: string;
+  overview?: string;
+}): CourseAboutData => ({
+  ...COURSE_ABOUT_BASE,
+  id,
+  name: title,
+  shortDescription,
+  overview,
+});
 
 /**
  * Static Data Engineering fixture matching the approved FAL-4380 screenshots.
@@ -29,49 +153,85 @@ export const DATA_ENGINEERING_PATHWAY: PathwayDetailData = {
       id: 'introduction-to-data-pipelines',
       title: 'Introduction to Data Pipelines',
       summary: '2 weeks · Self-paced · 1 certificate',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      courseAboutData: buildCourseAboutData({
+        id: 'introduction-to-data-pipelines',
+        title: 'Introduction to Data Pipelines',
+        shortDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      }),
     },
     {
       id: 'sql-for-data-engineers',
       title: 'SQL for Data Engineers',
       summary: '2 weeks · Self-paced · 1 badge',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      courseAboutData: buildCourseAboutData({
+        id: 'sql-for-data-engineers',
+        title: 'SQL for Data Engineers',
+        shortDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      }),
     },
     {
       id: 'apache-spark-and-distributed-computing',
       title: 'Apache Spark and Distributed Computing',
       summary: '2 weeks · Self-paced · 1 certificate',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      courseAboutData: buildCourseAboutData({
+        id: 'apache-spark-and-distributed-computing',
+        title: 'Apache Spark and Distributed Computing',
+        shortDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      }),
     },
     {
       id: 'cloud-data-warehousing',
       title: 'Cloud Data Warehousing',
       summary: '2 weeks · Self-paced · 1 certificate',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      courseAboutData: buildCourseAboutData({
+        id: 'cloud-data-warehousing',
+        title: 'Cloud Data Warehousing',
+        shortDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      }),
     },
     {
       id: 'real-time-streaming-with-kafka',
       title: 'Real-Time Streaming with Kafka',
       summary: '2 weeks · Self-paced · 1 badge',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      courseAboutData: buildCourseAboutData({
+        id: 'real-time-streaming-with-kafka',
+        title: 'Real-Time Streaming with Kafka',
+        shortDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      }),
     },
     {
       id: 'capstone-build-a-data-platform',
       title: 'Capstone: Build a Data Platform',
       summary: '2 weeks · Self-paced · 1 certificate',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      courseAboutData: buildCourseAboutData({
+        id: 'capstone-build-a-data-platform',
+        title: 'Capstone: Build a Data Platform',
+        shortDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        // Intentionally longer than the other fixtures so the modal body
+        // scrolls and can be exercised manually; repeats the same trusted
+        // static copy, never new or user-controlled content.
+        overview: COURSE_OVERVIEW_HTML.repeat(8),
+      }),
     },
     {
       id: 'data-quality-and-testing',
       title: 'Data Quality and Testing',
       summary: '3 weeks · Self-paced · 1 badge',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      courseAboutData: buildCourseAboutData({
+        id: 'data-quality-and-testing',
+        title: 'Data Quality and Testing',
+        shortDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      }),
     },
     {
       id: 'mlops-for-data-pipelines',
       title: 'MLOps for Data Pipelines',
       summary: '3 weeks · Self-paced · 1 certificate',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      courseAboutData: buildCourseAboutData({
+        id: 'mlops-for-data-pipelines',
+        title: 'MLOps for Data Pipelines',
+        shortDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      }),
     },
   ],
   credentials: [

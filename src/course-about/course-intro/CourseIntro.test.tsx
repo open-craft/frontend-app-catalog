@@ -87,4 +87,32 @@ describe('CourseIntro', () => {
       })).toBeInTheDocument();
     });
   });
+
+  describe('hideActions', () => {
+    it('renders course information without action footer', () => {
+      render(<CourseIntro courseAboutData={mockCourseAboutResponse} hideActions />);
+
+      expect(screen.getByText(mockCourseAboutResponse.name)).toBeInTheDocument();
+      expect(screen.getByText(mockCourseAboutResponse.org)).toBeInTheDocument();
+      expect(screen.getByText(mockCourseAboutResponse.shortDescription)).toBeInTheDocument();
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      expect(document.querySelector('.pgn__card-footer')).not.toBeInTheDocument();
+    });
+
+    it('does not mount enrollment or auth hooks when actions are hidden', () => {
+      render(<CourseIntro courseAboutData={mockCourseAboutResponse} hideActions />);
+
+      expect(getAuthenticatedUser).not.toHaveBeenCalled();
+      expect(useEnrollment).not.toHaveBeenCalled();
+    });
+
+    it('renders actions by default', async () => {
+      render(<CourseIntro courseAboutData={mockCourseAboutResponse} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: messages.enrollNowBtn.defaultMessage })).toBeInTheDocument();
+      });
+      expect(getAuthenticatedUser).toHaveBeenCalled();
+    });
+  });
 });

@@ -84,7 +84,17 @@ const messages = defineMessages({
   learnMoreBtn: {
     id: 'catalog.pathway-detail.learn-more-btn',
     defaultMessage: 'Learn more',
-    description: 'Placeholder button text for opening course details.',
+    description: 'Button text for opening the selected course details modal.',
+  },
+  courseModalTitle: {
+    id: 'catalog.pathway-detail.course-modal-title',
+    defaultMessage: 'Learn more about {courseTitle}',
+    description: 'Accessible title for the course details modal, including the selected course name.',
+  },
+  courseModalContextBanner: {
+    id: 'catalog.pathway-detail.course-modal-context-banner',
+    defaultMessage: 'This course is a part of the {pathwayName} pathway.',
+    description: 'Context banner in the course details modal header; the pathway name is shown in bold.',
   },
   seeMoreBtn: {
     id: 'catalog.pathway-detail.see-more-btn',

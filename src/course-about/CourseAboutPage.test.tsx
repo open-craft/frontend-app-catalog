@@ -153,9 +153,11 @@ describe('CourseAboutPage Integration Tests', () => {
     render(<CourseAboutPage />);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', {
+      const enrollButton = screen.getByRole('button', {
         name: messages.enrollNowBtn.defaultMessage,
-      })).toBeInTheDocument();
+      });
+      expect(enrollButton).toBeInTheDocument();
+      expect(enrollButton.closest('.pgn__card-footer')).toBeInTheDocument();
     });
   });
 

@@ -10,6 +10,7 @@ This slot is used to replace/modify/hide the entire course about overview sectio
 
 * `overviewData` - Object. HTML content of the course overview section.
 * `courseId` - String. The unique identifier of the course.
+* `hideActions` - Boolean. When true, hides the Studio action and skips the authentication lookup (used in embedded/hidden-action contexts).
 
 ## Examples
 

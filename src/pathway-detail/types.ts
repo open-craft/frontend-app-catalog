@@ -1,3 +1,5 @@
+import type { CourseAboutData } from '@src/course-about/types';
+
 export interface PathwayFact {
   label: string;
   value: string;
@@ -7,7 +9,7 @@ export interface PathwayCourse {
   id: string;
   title: string;
   summary: string;
-  description: string;
+  courseAboutData: CourseAboutData;
 }
 
 export interface PathwayCredential {

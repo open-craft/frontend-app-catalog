@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { SyntheticEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  Avatar, Badge, Button, Card, Collapsible, Container, Image, Layout, Nav, Stack,
+  Avatar, Badge, Button, Card, Collapsible, Container, Image, Layout, ModalDialog, Nav, Stack,
 } from '@openedx/paragon';
 import {
   BsFacebook as BsFacebookIcon,
@@ -17,10 +17,12 @@ import { getFullImageUrl } from '@src/generic/course-card/utils';
 import SocialLinks from '@src/course-about/course-sidebar/sidebar-social/SocialLinks';
 import type { SocialLink } from '@src/course-about/course-sidebar/sidebar-social/types';
 import { getFacebookShareUrl } from '@src/course-about/course-sidebar/sidebar-social/utils';
+import CourseAboutBody from '@src/course-about/CourseAboutBody';
 import NotFoundPage from '@src/not-found-page/NotFoundPage';
 
 import messages from './messages';
 import { getPathwayDetail } from './data';
+import type { PathwayCourse } from './types';
 
 /** Number of courses and credentials shown before a list is expanded. */
 export const INITIAL_VISIBLE_COUNT = 6;
@@ -48,6 +50,9 @@ const PathwayDetailPage = () => {
   const [showAllCourses, setShowAllCourses] = useState(false);
   const [showAllCredentials, setShowAllCredentials] = useState(false);
   const [activeSection, setActiveSection] = useState<string>();
+  // The course whose Learn-more modal is open; null keeps the dialog closed.
+  // Deliberately page-local state: the modal never touches the URL or history.
+  const [selectedCourse, setSelectedCourse] = useState<PathwayCourse | null>(null);
   const intersectingSections = useRef(new Set<string>());
 
   // Page-local scrollspy: one IntersectionObserver watches the five section
@@ -234,8 +239,8 @@ const PathwayDetailPage = () => {
                       </span>
                     )}
                   >
-                    <p className="mb-2">{course.description}</p>
-                    <Button variant="outline-primary" size="sm" disabled>
+                    <p className="mb-2">{course.courseAboutData.shortDescription}</p>
+                    <Button variant="outline-primary" size="sm" onClick={() => setSelectedCourse(course)}>
                       {intl.formatMessage(messages.learnMoreBtn)}
                     </Button>
                   </Collapsible>
@@ -334,6 +339,43 @@ const PathwayDetailPage = () => {
             </aside>
           </Layout.Element>
         </Layout>
+        <ModalDialog
+          title={selectedCourse
+            ? intl.formatMessage(messages.courseModalTitle, { courseTitle: selectedCourse.title })
+            : ''}
+          isOpen={selectedCourse !== null}
+          onClose={() => setSelectedCourse(null)}
+          size="xl"
+          // Dark variant styles the header with white text and inverts the
+          // close button to white; only the header tint is overridden in
+          // PathwayDetailPage.scss, the dialog body stays white.
+          variant="dark"
+          isOverflowVisible={false}
+          // Near-full-screen below the md breakpoint while keeping the close
+          // control; the default 80vh cap plus the internally scrollable
+          // ModalDialog.Body bounds the dialog on larger screens.
+          isFullscreenOnMobile
+          className="pathway-detail-course-modal"
+        >
+          {selectedCourse && (
+            <>
+              <ModalDialog.Header>
+                {/* Non-heading element: the banner is a compact bar, not a page heading. */}
+                <ModalDialog.Title as="p">
+                  {intl.formatMessage(messages.courseModalContextBanner, {
+                    pathwayName: <strong>{pathway.name}</strong>,
+                  })}
+                </ModalDialog.Title>
+              </ModalDialog.Header>
+              <ModalDialog.Body>
+                <CourseAboutBody
+                  courseAboutData={selectedCourse.courseAboutData}
+                  hideActions
+                />
+              </ModalDialog.Body>
+            </>
+          )}
+        </ModalDialog>
       </Container>
     </>
   );

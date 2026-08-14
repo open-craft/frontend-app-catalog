@@ -9,10 +9,11 @@ import messages from '../messages';
 import type { CourseOverviewProps } from './types';
 import { processOverviewContent } from './utils';
 
-export const CourseOverview = ({ overviewData, courseId }: CourseOverviewProps) => {
+export const CourseOverview = ({ overviewData, courseId, hideActions = false }: CourseOverviewProps) => {
   const intl = useIntl();
-  const authenticatedUser = getAuthenticatedUser();
-  const isGlobalStaff = authenticatedUser?.administrator || false;
+  // Short-circuit the auth lookup entirely when actions are hidden (e.g. the
+  // pathway modal); the Studio action must never appear there.
+  const isGlobalStaff = !hideActions && (getAuthenticatedUser()?.administrator || false);
   const isExtraSmall = useMediaQuery({ maxWidth: breakpoints.extraSmall.maxWidth });
 
   const processedOverviewData = processOverviewContent(overviewData, getConfig().LMS_BASE_URL);
