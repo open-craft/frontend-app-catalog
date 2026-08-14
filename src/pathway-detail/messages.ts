@@ -1,0 +1,106 @@
+import { defineMessages } from '@edx/frontend-platform/i18n';
+
+const messages = defineMessages({
+  pathwayBadge: {
+    id: 'catalog.pathway-detail.pathway-badge',
+    defaultMessage: 'Pathway',
+    description: 'Label shown above the pathway name in the hero.',
+  },
+  enrollNowBtn: {
+    id: 'catalog.pathway-detail.enroll-now-btn',
+    defaultMessage: 'Enroll now',
+    description: 'Text for the disabled pathway enrollment call to action shown to unenrolled learners.',
+  },
+  viewPathwayBtn: {
+    id: 'catalog.pathway-detail.view-pathway-btn',
+    defaultMessage: 'View pathway',
+    description: 'Text for the disabled pathway call to action shown to enrolled learners.',
+  },
+  sectionsNavLabel: {
+    id: 'catalog.pathway-detail.sections-nav-label',
+    defaultMessage: 'Pathway sections',
+    description: 'Accessible label for the pathway section navigation.',
+  },
+  aboutNavLink: {
+    id: 'catalog.pathway-detail.about-nav-link',
+    defaultMessage: 'About',
+    description: 'Navigation link to the About section.',
+  },
+  credentialsNavLink: {
+    id: 'catalog.pathway-detail.credentials-nav-link',
+    defaultMessage: 'Credentials',
+    description: 'Navigation link to the Credentials section.',
+  },
+  instructorsNavLink: {
+    id: 'catalog.pathway-detail.instructors-nav-link',
+    defaultMessage: 'Instructors',
+    description: 'Navigation link to the Instructors section.',
+  },
+  faqsNavLink: {
+    id: 'catalog.pathway-detail.faqs-nav-link',
+    defaultMessage: 'FAQs',
+    description: 'Navigation link to the FAQs section.',
+  },
+  testimonialsNavLink: {
+    id: 'catalog.pathway-detail.testimonials-nav-link',
+    defaultMessage: 'Testimonials',
+    description: 'Navigation link to the Testimonials section.',
+  },
+  aboutHeading: {
+    id: 'catalog.pathway-detail.about-heading',
+    defaultMessage: 'About this Pathway',
+    description: 'Heading for the About section.',
+  },
+  coursesHeading: {
+    id: 'catalog.pathway-detail.courses-heading',
+    defaultMessage: 'Courses',
+    description: 'Heading for the courses list within the About section.',
+  },
+  completeCoursesNote: {
+    id: 'catalog.pathway-detail.complete-courses-note',
+    defaultMessage: 'Complete {count, plural, one {this # course} other {these # courses}} in any order',
+    description: 'Note shown above the pathway courses list, including the total course count.',
+  },
+  credentialsHeading: {
+    id: 'catalog.pathway-detail.credentials-heading',
+    defaultMessage: 'Credentials',
+    description: 'Heading for the Credentials section.',
+  },
+  instructorsHeading: {
+    id: 'catalog.pathway-detail.instructors-heading',
+    defaultMessage: 'Instructors',
+    description: 'Heading for the Instructors section.',
+  },
+  faqsHeading: {
+    id: 'catalog.pathway-detail.faqs-heading',
+    defaultMessage: 'FAQs',
+    description: 'Heading for the FAQs section.',
+  },
+  testimonialsHeading: {
+    id: 'catalog.pathway-detail.testimonials-heading',
+    defaultMessage: 'Testimonials',
+    description: 'Heading for the Testimonials section.',
+  },
+  learnMoreBtn: {
+    id: 'catalog.pathway-detail.learn-more-btn',
+    defaultMessage: 'Learn more',
+    description: 'Placeholder button text for opening course details.',
+  },
+  seeMoreBtn: {
+    id: 'catalog.pathway-detail.see-more-btn',
+    defaultMessage: 'See more',
+    description: 'Button text for revealing hidden list items.',
+  },
+  seeLessBtn: {
+    id: 'catalog.pathway-detail.see-less-btn',
+    defaultMessage: 'See less',
+    description: 'Button text for hiding revealed list items.',
+  },
+  factsAriaLabel: {
+    id: 'catalog.pathway-detail.facts-aria-label',
+    defaultMessage: 'Pathway facts',
+    description: 'Accessible label for the pathway facts sidebar.',
+  },
+});
+
+export default messages;

@@ -7,6 +7,7 @@ import CatalogHeader from './header/CatalogHeader';
 import HomePage from './home/HomePage';
 import CatalogPage from './catalog/CatalogPage';
 import CourseAboutPage from './course-about/CourseAboutPage';
+import PathwayDetailPage from './pathway-detail/PathwayDetailPage';
 import NotFoundPage from './not-found-page/NotFoundPage';
 import { ROUTES } from './routes';
 
@@ -22,6 +23,7 @@ const App = () => (
             <Route path={ROUTES.HOME} element={<HomePage />} />
             <Route path={ROUTES.COURSES} element={<CatalogPage />} />
             <Route path={ROUTES.COURSE_ABOUT} element={<CourseAboutPage />} />
+            <Route path={ROUTES.PATHWAY_DETAIL} element={<PathwayDetailPage />} />
             <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
           </Routes>
         </main>

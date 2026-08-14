@@ -5,6 +5,8 @@ import messages from './catalog/messages';
 import { useCatalogListSearch } from './data/course-list-search/hooks';
 import { useCourseAboutData } from './course-about/data/hooks';
 import courseAboutIntroMessages from './course-about/course-intro/messages';
+import pathwayDetailMessages from './pathway-detail/messages';
+import { DATA_ENGINEERING_PATHWAY } from './pathway-detail/data';
 import {
   render, within, waitFor, screen,
 } from './setupTest';
@@ -125,6 +127,15 @@ describe('App', () => {
     expect(screen.getByText(mockCourseAboutResponse.shortDescription)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: courseAboutIntroMessages.enrollNowBtn.defaultMessage })).toBeInTheDocument();
     expect(screen.getByRole('img', { name: mockCourseAboutResponse.name })).toBeInTheDocument();
+  });
+
+  it('renders PathwayDetailPage on "/pathways/some-pathway-id"', () => {
+    window.testHistory = ['/pathways/pathway-1'];
+
+    render(<App />);
+
+    expect(screen.getByRole('heading', { level: 1, name: DATA_ENGINEERING_PATHWAY.name })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: pathwayDetailMessages.enrollNowBtn.defaultMessage })).toBeDisabled();
   });
 
   it('renders NotFoundPage on unknown route', () => {

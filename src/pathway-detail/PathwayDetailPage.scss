@@ -1,0 +1,64 @@
+.pathway-detail-page {
+  // Height of the sticky section navigation. Section scroll-margin-top and the
+  // future IntersectionObserver root margin must use this same value.
+  --pathway-detail-nav-height: 3.5rem;
+
+  .pathway-detail-hero {
+    .pathway-detail-hero-content {
+      @media (--pgn-size-breakpoint-min-width-lg) {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+
+    .pathway-detail-hero-image {
+      width: 100%;
+      max-height: 16rem;
+      object-fit: cover;
+
+      @media (--pgn-size-breakpoint-min-width-lg) {
+        width: 45%;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .pathway-detail-nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: var(--pathway-detail-nav-height);
+    overflow-x: auto;
+    // Overrides the Bootstrap .nav flex-wrap: wrap that Paragon core applies,
+    // so all section links stay on one scrollable horizontal line.
+    flex-wrap: nowrap;
+    border-bottom: 1px solid var(--pgn-color-light-300);
+    background-color: var(--pgn-color-body-bg);
+
+    .pathway-detail-nav-link {
+      white-space: nowrap;
+    }
+  }
+
+  .pathway-detail-section {
+    scroll-margin-top: var(--pathway-detail-nav-height);
+  }
+
+  .pathway-detail-credentials {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--pgn-spacing-spacer-3);
+
+    @media (--pgn-size-breakpoint-min-width-md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .pathway-detail-faq {
+    border-bottom: 1px solid var(--pgn-color-light-300);
+
+    &:first-child {
+      border-top: 1px solid var(--pgn-color-light-300);
+    }
+  }
+}
