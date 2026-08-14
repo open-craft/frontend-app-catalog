@@ -101,6 +101,41 @@ const messages = defineMessages({
     defaultMessage: 'Pathway facts',
     description: 'Accessible label for the pathway facts sidebar.',
   },
+  shareHeading: {
+    id: 'catalog.pathway-detail.share-heading',
+    defaultMessage: 'Share this pathway',
+    description: 'Heading for the social sharing links in the sidebar.',
+  },
+  shareTwitterLabel: {
+    id: 'catalog.pathway-detail.share-twitter-label',
+    defaultMessage: 'Share this pathway on X (Twitter)',
+    description: 'Accessible label for the pathway Twitter share link.',
+  },
+  shareFacebookLabel: {
+    id: 'catalog.pathway-detail.share-facebook-label',
+    defaultMessage: 'Share this pathway on Facebook',
+    description: 'Accessible label for the pathway Facebook share link.',
+  },
+  shareEmailLabel: {
+    id: 'catalog.pathway-detail.share-email-label',
+    defaultMessage: 'Share this pathway by email',
+    description: 'Accessible label for the pathway email share link.',
+  },
+  shareTwitterText: {
+    id: 'catalog.pathway-detail.share-twitter-text',
+    defaultMessage: 'Check out the {pathwayName} pathway: {url}',
+    description: 'Pre-filled text for sharing the pathway on X (Twitter).',
+  },
+  shareEmailSubject: {
+    id: 'catalog.pathway-detail.share-email-subject',
+    defaultMessage: 'The {pathwayName} pathway',
+    description: 'Email subject for sharing the pathway.',
+  },
+  shareEmailBody: {
+    id: 'catalog.pathway-detail.share-email-body',
+    defaultMessage: 'I found the {pathwayName} pathway and thought you might be interested: {url}',
+    description: 'Email body for sharing the pathway.',
+  },
 });
 
 export default messages;

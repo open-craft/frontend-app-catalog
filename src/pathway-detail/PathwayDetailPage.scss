@@ -1,7 +1,9 @@
 .pathway-detail-page {
-  // Height of the sticky section navigation. Section scroll-margin-top and the
-  // future IntersectionObserver root margin must use this same value.
-  --pathway-detail-nav-height: 3.5rem;
+  // Height of the sticky section navigation, in px so the same value stays
+  // valid as an IntersectionObserver rootMargin length (rootMargin accepts
+  // only px/%). Section scroll-margin-top and the observer both derive from
+  // this one value.
+  --pathway-detail-nav-height: 56px;
 
   .pathway-detail-hero {
     .pathway-detail-hero-content {

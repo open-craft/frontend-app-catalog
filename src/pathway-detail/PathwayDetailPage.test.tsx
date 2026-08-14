@@ -3,7 +3,7 @@ import { fireEvent } from '@testing-library/react';
 import noCourseImg from '@src/assets/images/no-course-image.svg';
 
 import {
-  render, screen, userEvent, within,
+  act, render, screen, userEvent, within,
 } from '../setupTest';
 import { ROUTES } from '../routes';
 import PathwayDetailPage, { INITIAL_VISIBLE_COUNT } from './PathwayDetailPage';
@@ -39,10 +39,80 @@ const renderPathwayDetailPage = () => render(
   </Routes>,
 );
 
+/**
+ * Local IntersectionObserver mock: records instances so tests can drive the
+ * observer callback with crafted entries.
+ */
+class MockIntersectionObserver {
+  callback: IntersectionObserverCallback;
+
+  options: IntersectionObserverInit;
+
+  observe = jest.fn();
+
+  unobserve = jest.fn();
+
+  disconnect = jest.fn();
+
+  static instances: MockIntersectionObserver[] = [];
+
+  constructor(callback: IntersectionObserverCallback, options: IntersectionObserverInit) {
+    this.callback = callback;
+    this.options = options;
+    MockIntersectionObserver.instances.push(this);
+  }
+}
+
+const getObserver = () => (
+  MockIntersectionObserver.instances[MockIntersectionObserver.instances.length - 1]
+);
+
+// jsdom cannot resolve custom properties from stylesheets, so emulate the
+// one value the page reads from PathwayDetailPage.scss.
+const mockNavHeight = (height: string) => {
+  const realGetComputedStyle = window.getComputedStyle.bind(window);
+  const mockGetComputedStyle: typeof window.getComputedStyle = (
+    element: Element,
+    pseudoElement?: string | null,
+  ) => {
+    const style = realGetComputedStyle(element, pseudoElement);
+    if ((element as HTMLElement).classList?.contains('pathway-detail-nav')) {
+      const getPropertyValue = style.getPropertyValue.bind(style);
+      style.getPropertyValue = (property: string) => (
+        property === '--pathway-detail-nav-height' ? height : getPropertyValue(property)
+      );
+    }
+    return style;
+  };
+  jest.spyOn(window, 'getComputedStyle').mockImplementation(mockGetComputedStyle);
+};
+
+// The page reads section geometry fresh from the live DOM on every callback,
+// so tests position sections via getBoundingClientRect instead of baking
+// (stale) geometry into the entry objects.
+const setSectionTop = (target: HTMLElement, top: number) => {
+  jest.spyOn(target, 'getBoundingClientRect').mockReturnValue({ top } as DOMRect);
+};
+
+const makeEntry = (target: HTMLElement, isIntersecting: boolean): IntersectionObserverEntry => ({
+  target,
+  isIntersecting,
+} as unknown as IntersectionObserverEntry);
+
+const fireIntersections = (...entries: IntersectionObserverEntry[]) => {
+  const observer = getObserver();
+  act(() => observer.callback(entries, observer as unknown as IntersectionObserver));
+};
+
 describe('PathwayDetailPage', () => {
   beforeEach(() => {
     mockIsEnrolled = undefined;
     window.testHistory = ['/pathways/pathway-1'];
+    MockIntersectionObserver.instances = [];
+    Object.defineProperty(global, 'IntersectionObserver', {
+      writable: true,
+      value: MockIntersectionObserver,
+    });
   });
 
   it('renders the Data Engineering fixture for the route pathway ID', () => {
@@ -219,5 +289,241 @@ describe('PathwayDetailPage', () => {
     expect(secondFaqTrigger).toHaveAttribute('aria-expanded', 'true');
     expect(within(firstFaq).getByText(faqs[0].answer)).toBeVisible();
     expect(within(secondFaq).getByText(faqs[1].answer)).toBeVisible();
+  });
+
+  describe('navigation scrollspy', () => {
+    beforeEach(() => {
+      mockNavHeight('56px');
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('marks the observed section nearest the sticky boundary as active', () => {
+      renderPathwayDetailPage();
+      const credentials = document.getElementById('credentials') as HTMLElement;
+      const faqs = document.getElementById('faqs') as HTMLElement;
+      setSectionTop(credentials, 56);
+      setSectionTop(faqs, 250);
+
+      fireIntersections(
+        makeEntry(credentials, true),
+        makeEntry(faqs, true),
+      );
+
+      expect(screen.getByRole('link', { name: messages.credentialsNavLink.defaultMessage }))
+        .toHaveAttribute('aria-current', 'location');
+      [
+        messages.aboutNavLink,
+        messages.instructorsNavLink,
+        messages.faqsNavLink,
+        messages.testimonialsNavLink,
+      ].forEach((message) => {
+        expect(screen.getByRole('link', { name: message.defaultMessage }))
+          .not.toHaveAttribute('aria-current');
+      });
+
+      // Once credentials scrolls past the boundary, FAQs becomes active.
+      setSectionTop(credentials, -100);
+      setSectionTop(faqs, 56);
+      fireIntersections(
+        makeEntry(credentials, false),
+        makeEntry(faqs, true),
+      );
+
+      expect(screen.getByRole('link', { name: messages.faqsNavLink.defaultMessage }))
+        .toHaveAttribute('aria-current', 'location');
+      expect(screen.getByRole('link', { name: messages.credentialsNavLink.defaultMessage }))
+        .not.toHaveAttribute('aria-current');
+    });
+
+    it('picks the intersecting section nearest the boundary deterministically', () => {
+      renderPathwayDetailPage();
+      const about = document.getElementById('about') as HTMLElement;
+      const credentials = document.getElementById('credentials') as HTMLElement;
+      const instructors = document.getElementById('instructors') as HTMLElement;
+
+      // The nearest section wins over a more recently reported one.
+      setSectionTop(credentials, 250);
+      setSectionTop(instructors, 56);
+      fireIntersections(
+        makeEntry(credentials, true),
+        makeEntry(instructors, true),
+      );
+      expect(screen.getByRole('link', { name: messages.instructorsNavLink.defaultMessage }))
+        .toHaveAttribute('aria-current', 'location');
+
+      // Equal distances keep the first section in navigation order.
+      setSectionTop(about, 56);
+      setSectionTop(instructors, 56);
+      fireIntersections(
+        makeEntry(about, true),
+        makeEntry(instructors, true),
+      );
+      expect(screen.getByRole('link', { name: messages.aboutNavLink.defaultMessage }))
+        .toHaveAttribute('aria-current', 'location');
+
+      // Sections that stopped intersecting are ignored.
+      setSectionTop(about, -100);
+      setSectionTop(credentials, 56);
+      fireIntersections(
+        makeEntry(about, false),
+        makeEntry(credentials, true),
+      );
+      expect(screen.getByRole('link', { name: messages.credentialsNavLink.defaultMessage }))
+        .toHaveAttribute('aria-current', 'location');
+
+      // With no intersecting section the current active link is kept.
+      setSectionTop(credentials, -10);
+      setSectionTop(instructors, -20);
+      fireIntersections(
+        makeEntry(credentials, false),
+        makeEntry(instructors, false),
+      );
+      expect(screen.getByRole('link', { name: messages.credentialsNavLink.defaultMessage }))
+        .toHaveAttribute('aria-current', 'location');
+    });
+
+    it('re-reads section geometry fresh instead of trusting cached entry geometry', () => {
+      renderPathwayDetailPage();
+      const credentials = document.getElementById('credentials') as HTMLElement;
+      const faqs = document.getElementById('faqs') as HTMLElement;
+      setSectionTop(credentials, 56);
+      setSectionTop(faqs, 250);
+      fireIntersections(makeEntry(credentials, true), makeEntry(faqs, true));
+      expect(screen.getByRole('link', { name: messages.credentialsNavLink.defaultMessage }))
+        .toHaveAttribute('aria-current', 'location');
+
+      // The page scrolls: FAQs crosses the boundary while credentials falls
+      // below it. The observer reports only the FAQs change; credentials' old
+      // entry geometry (top 56) is stale. Only a fresh getBoundingClientRect
+      // read of both sections picks FAQs.
+      setSectionTop(credentials, 250);
+      setSectionTop(faqs, 56);
+      fireIntersections(makeEntry(faqs, true));
+
+      expect(screen.getByRole('link', { name: messages.faqsNavLink.defaultMessage }))
+        .toHaveAttribute('aria-current', 'location');
+      expect(screen.getByRole('link', { name: messages.credentialsNavLink.defaultMessage }))
+        .not.toHaveAttribute('aria-current');
+    });
+
+    it('synchronizes the hash with window.history.replaceState, preserving pathname and query', () => {
+      window.history.replaceState(null, '', '/pathways/pathway-1?tab=courses');
+      renderPathwayDetailPage();
+      const replaceState = jest.spyOn(window.history, 'replaceState');
+      const credentials = document.getElementById('credentials') as HTMLElement;
+      setSectionTop(credentials, 56);
+
+      fireIntersections(makeEntry(credentials, true));
+
+      expect(replaceState).toHaveBeenCalledTimes(1);
+      expect(replaceState).toHaveBeenCalledWith(null, '', '/pathways/pathway-1?tab=courses#credentials');
+      replaceState.mockRestore();
+    });
+
+    it('skips replaceState when the hash already matches the active section', () => {
+      window.history.replaceState(null, '', '/pathways/pathway-1#credentials');
+      renderPathwayDetailPage();
+      const replaceState = jest.spyOn(window.history, 'replaceState');
+      const credentials = document.getElementById('credentials') as HTMLElement;
+      setSectionTop(credentials, 56);
+
+      fireIntersections(makeEntry(credentials, true));
+
+      expect(replaceState).not.toHaveBeenCalled();
+      replaceState.mockRestore();
+    });
+
+    it('derives the rootMargin from the nav-height CSS custom property', () => {
+      // 56px boundary from the beforeEach mock.
+      renderPathwayDetailPage();
+      expect(getObserver().options.rootMargin).toBe('-56px 0px 0px 0px');
+
+      // Without the stylesheet value the observer falls back to a safe offset.
+      jest.restoreAllMocks();
+      renderPathwayDetailPage();
+      expect(getObserver().options.rootMargin).toBe('-0px 0px 0px 0px');
+    });
+
+    it('observes each of the five sections once and disconnects on unmount', () => {
+      const { unmount } = renderPathwayDetailPage();
+      const observer = getObserver();
+
+      expect(observer.observe).toHaveBeenCalledTimes(5);
+      expect(observer.observe.mock.calls.map(([section]) => (section as HTMLElement).id)).toEqual([
+        'about',
+        'credentials',
+        'instructors',
+        'faqs',
+        'testimonials',
+      ]);
+
+      unmount();
+      expect(observer.disconnect).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('renders Facebook, X (Twitter), and email share links for the current pathway URL', () => {
+    window.history.replaceState(null, '', '/pathways/pathway-1');
+    renderPathwayDetailPage();
+    const shareUrl = window.location.href;
+    const { name: pathwayName } = DATA_ENGINEERING_PATHWAY;
+
+    const facebookLink = screen.getByText(messages.shareFacebookLabel.defaultMessage).closest('a');
+    expect(facebookLink).toHaveAttribute(
+      'href',
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+    );
+
+    const tweetText = `Check out the ${pathwayName} pathway: ${shareUrl}`;
+    const twitterLink = screen.getByText(messages.shareTwitterLabel.defaultMessage).closest('a');
+    expect(twitterLink).toHaveAttribute(
+      'href',
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`,
+    );
+
+    const emailLink = screen.getByText(messages.shareEmailLabel.defaultMessage).closest('a');
+    expect(emailLink).toHaveAttribute(
+      'href',
+      `mailto:?subject=${encodeURIComponent(`The ${pathwayName} pathway`)}`
+      + `&body=${encodeURIComponent(`I found the ${pathwayName} pathway and thought you might be interested: ${shareUrl}`)}`,
+    );
+  });
+
+  it('reflects an observer-driven hash change in the share destinations', () => {
+    window.history.replaceState(null, '', '/pathways/pathway-1');
+    renderPathwayDetailPage();
+    const credentials = document.getElementById('credentials') as HTMLElement;
+    setSectionTop(credentials, 56);
+
+    fireIntersections(makeEntry(credentials, true));
+
+    // The re-render triggered by the active-section change must build share
+    // URLs from the already-synchronized location, not a stale href.
+    const shareUrl = window.location.href;
+    expect(shareUrl).toBe('http://localhost/pathways/pathway-1#credentials');
+    const { name: pathwayName } = DATA_ENGINEERING_PATHWAY;
+
+    const facebookLink = screen.getByText(messages.shareFacebookLabel.defaultMessage).closest('a');
+    expect(facebookLink).toHaveAttribute(
+      'href',
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+    );
+
+    const tweetText = `Check out the ${pathwayName} pathway: ${shareUrl}`;
+    const twitterLink = screen.getByText(messages.shareTwitterLabel.defaultMessage).closest('a');
+    expect(twitterLink).toHaveAttribute(
+      'href',
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`,
+    );
+
+    const emailLink = screen.getByText(messages.shareEmailLabel.defaultMessage).closest('a');
+    expect(emailLink).toHaveAttribute(
+      'href',
+      `mailto:?subject=${encodeURIComponent(`The ${pathwayName} pathway`)}`
+      + `&body=${encodeURIComponent(`I found the ${pathwayName} pathway and thought you might be interested: ${shareUrl}`)}`,
+    );
   });
 });

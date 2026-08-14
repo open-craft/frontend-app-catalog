@@ -1,14 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { SyntheticEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Avatar, Badge, Button, Card, Collapsible, Container, Image, Layout, Nav, Stack,
 } from '@openedx/paragon';
+import {
+  BsFacebook as BsFacebookIcon,
+  BsTwitterX as BsTwitterXIcon,
+  Email as EmailIcon,
+} from '@openedx/paragon/icons';
 import { useIntl } from '@edx/frontend-platform/i18n';
 
 import { Head } from '@src/generic/head';
 import noCourseImg from '@src/assets/images/no-course-image.svg';
 import { getFullImageUrl } from '@src/generic/course-card/utils';
+import SocialLinks from '@src/course-about/course-sidebar/sidebar-social/SocialLinks';
+import type { SocialLink } from '@src/course-about/course-sidebar/sidebar-social/types';
+import { getFacebookShareUrl } from '@src/course-about/course-sidebar/sidebar-social/utils';
 import NotFoundPage from '@src/not-found-page/NotFoundPage';
 
 import messages from './messages';
@@ -39,6 +47,79 @@ const PathwayDetailPage = () => {
   const { pathwayId } = useParams<{ pathwayId: string }>();
   const [showAllCourses, setShowAllCourses] = useState(false);
   const [showAllCredentials, setShowAllCredentials] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>();
+  const intersectingSections = useRef(new Set<string>());
+
+  // Page-local scrollspy: one IntersectionObserver watches the five section
+  // targets. The nav height is read from the same CSS custom property used for
+  // scroll-margin-top (px unit keeps it valid as a rootMargin length), so the
+  // JS and CSS offsets cannot drift.
+  useEffect(() => {
+    // Paragon Nav does not forward refs to its DOM element, so resolve it
+    // directly; this page renders exactly one section navigation.
+    const nav = document.querySelector<HTMLElement>('.pathway-detail-nav');
+    const sections = SECTION_NAV_ITEMS
+      .map(({ id }) => document.getElementById(id))
+      .filter((section): section is HTMLElement => section !== null);
+    if (!nav || sections.length === 0) {
+      return undefined;
+    }
+
+    const navHeight = parseFloat(getComputedStyle(nav).getPropertyValue('--pathway-detail-nav-height'));
+    const stickyBoundary = Number.isFinite(navHeight) ? navHeight : 0;
+
+    // Mirror the active section in the URL hash without adding a history
+    // entry per scroll event; pathname and query are preserved. This runs
+    // before setActiveSection so the re-render reads the already-synced URL
+    // (share destinations are built from window.location.href).
+    const syncHash = (sectionId: string) => {
+      const hash = `#${sectionId}`;
+      if (window.location.hash !== hash) {
+        window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}${hash}`);
+      }
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          intersectingSections.current.add(entry.target.id);
+        } else {
+          intersectingSections.current.delete(entry.target.id);
+        }
+      });
+
+      // Several sections can intersect at once. Pick the one nearest the
+      // sticky boundary (the nav's bottom edge); a strictly-smaller
+      // comparison keeps the first matching section on ties, so the choice
+      // is deterministic and does not flicker. Geometry is read fresh from
+      // the live DOM: entry.boundingClientRect is stale between callbacks.
+      let nearestId: string | undefined;
+      let nearestDistance = Infinity;
+      SECTION_NAV_ITEMS.forEach(({ id }) => {
+        if (!intersectingSections.current.has(id)) {
+          return;
+        }
+        const section = document.getElementById(id);
+        if (!section) {
+          return;
+        }
+        const distance = Math.abs(section.getBoundingClientRect().top - stickyBoundary);
+        if (distance < nearestDistance) {
+          nearestId = id;
+          nearestDistance = distance;
+        }
+      });
+      // Keep the current section active while none intersect (e.g. the page
+      // footer) rather than flickering the active link off.
+      if (nearestId) {
+        syncHash(nearestId);
+        setActiveSection(nearestId);
+      }
+    }, { rootMargin: `-${stickyBoundary}px 0px 0px 0px` });
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
 
   const pathway = pathwayId ? getPathwayDetail(pathwayId) : undefined;
 
@@ -58,6 +139,36 @@ const PathwayDetailPage = () => {
       img.src = noCourseImg;
     }
   };
+
+  // Read during render so observer-driven hash changes (synced before
+  // setActiveSection) are reflected in the share destinations.
+  const shareUrl = window.location.href;
+  const socialLinks: SocialLink[] = [
+    {
+      id: 'facebook',
+      destination: getFacebookShareUrl(),
+      icon: BsFacebookIcon,
+      screenReaderText: intl.formatMessage(messages.shareFacebookLabel),
+    },
+    {
+      id: 'twitter',
+      destination: `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+        intl.formatMessage(messages.shareTwitterText, { pathwayName: pathway.name, url: shareUrl }),
+      )}`,
+      icon: BsTwitterXIcon,
+      screenReaderText: intl.formatMessage(messages.shareTwitterLabel),
+    },
+    {
+      id: 'email',
+      destination: `mailto:?subject=${encodeURIComponent(
+        intl.formatMessage(messages.shareEmailSubject, { pathwayName: pathway.name }),
+      )}&body=${encodeURIComponent(
+        intl.formatMessage(messages.shareEmailBody, { pathwayName: pathway.name, url: shareUrl }),
+      )}`,
+      icon: EmailIcon,
+      screenReaderText: intl.formatMessage(messages.shareEmailLabel),
+    },
+  ];
 
   return (
     <>
@@ -90,7 +201,12 @@ const PathwayDetailPage = () => {
           className="pathway-detail-nav align-items-center gap-4 mt-4"
         >
           {SECTION_NAV_ITEMS.map(({ id, message }) => (
-            <Nav.Link key={id} href={`#${id}`} className="pathway-detail-nav-link px-0">
+            <Nav.Link
+              key={id}
+              href={`#${id}`}
+              className="pathway-detail-nav-link px-0"
+              aria-current={activeSection === id ? 'location' : undefined}
+            >
               {intl.formatMessage(message)}
             </Nav.Link>
           ))}
@@ -209,6 +325,12 @@ const PathwayDetailPage = () => {
                   ))}
                 </Card.Body>
               </Card>
+              <div className="mt-4">
+                <h3 className="h6 mb-2">{intl.formatMessage(messages.shareHeading)}</h3>
+                <Stack direction="horizontal" gap={3}>
+                  <SocialLinks socialLinks={socialLinks} />
+                </Stack>
+              </div>
             </aside>
           </Layout.Element>
         </Layout>
