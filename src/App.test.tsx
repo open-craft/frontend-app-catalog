@@ -54,11 +54,25 @@ jest.mock('@edx/frontend-platform/auth', () => ({
   getAuthenticatedUser: jest.fn(),
 }));
 
+// jsdom has no IntersectionObserver; PathwayDetailPage needs one (see
+// pathway-detail/PathwayDetailPage.test.tsx for the full driveable variant).
+class MockIntersectionObserver {
+  observe = jest.fn();
+
+  unobserve = jest.fn();
+
+  disconnect = jest.fn();
+}
+
 describe('App', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     (getAuthenticatedUser as jest.Mock).mockReturnValue(null);
     jest.clearAllMocks();
+    Object.defineProperty(global, 'IntersectionObserver', {
+      writable: true,
+      value: MockIntersectionObserver,
+    });
   });
 
   mockCatalogListSearch.mockReturnValue({
