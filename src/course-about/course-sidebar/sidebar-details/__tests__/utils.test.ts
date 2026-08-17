@@ -129,6 +129,7 @@ describe('getSidebarDetails', () => {
     const endDateDetail = getDetailByKey(result, SIDEBAR_DETAIL_KEYS.END_DATE);
 
     expect(endDateDetail?.show).toBe(false);
+    expect(mockIntl.formatDate.mock.calls.every(([date]) => date instanceof Date && !Number.isNaN(date.getTime()))).toBe(true);
   });
 
   it('handles effort when provided', () => {

@@ -2,12 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import type { SyntheticEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  Avatar, Badge, Button, Card, Collapsible, Container, Image, Layout, ModalDialog, Nav, Stack,
+  Badge, Button, Card, Collapsible, Container, Icon, Image, Layout, ModalDialog, Nav, Stack,
 } from '@openedx/paragon';
 import {
+  AccessTimeFilled as AccessTimeFilledIcon,
+  Add as AddIcon,
   BsFacebook as BsFacebookIcon,
   BsTwitterX as BsTwitterXIcon,
+  CardMembership as CardMembershipIcon,
   Email as EmailIcon,
+  Remove as RemoveIcon,
+  WorkspacePremium,
 } from '@openedx/paragon/icons';
 import { useIntl } from '@edx/frontend-platform/i18n';
 
@@ -41,7 +46,32 @@ const SECTION_NAV_ITEMS = [
  */
 const PAGE_LAYOUT = {
   xs: [{ span: 12 }, { span: 12 }],
+  sm: [{ span: 12 }, { span: 12 }],
+  md: [{ span: 12 }, { span: 12 }],
   lg: [{ span: 9 }, { span: 3 }],
+  xl: [{ span: 9 }, { span: 3 }],
+};
+
+const renderCourseTitle = (course: PathwayCourse) => {
+  const [duration, pace, credential] = course.summary.split(' · ');
+  const isBadge = credential?.toLowerCase().includes('badge');
+
+  return (
+    <span className="pathway-detail-course-title">
+      <strong>{course.title}</strong>
+      <span className="pathway-detail-course-meta">
+        <span>
+          <Icon src={AccessTimeFilledIcon} size="sm" />
+          {duration}
+        </span>
+        <span>{pace}</span>
+        <span>
+          <Icon src={isBadge ? WorkspacePremium : CardMembershipIcon} size="sm" />
+          {credential}
+        </span>
+      </span>
+    </span>
+  );
 };
 
 const PathwayDetailPage = () => {
@@ -49,7 +79,10 @@ const PathwayDetailPage = () => {
   const { pathwayId } = useParams<{ pathwayId: string }>();
   const [showAllCourses, setShowAllCourses] = useState(false);
   const [showAllCredentials, setShowAllCredentials] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>();
+  const [activeSection, setActiveSection] = useState<string | undefined>(() => {
+    const initialSection = window.location.hash.slice(1);
+    return SECTION_NAV_ITEMS.some(({ id }) => id === initialSection) ? initialSection : 'about';
+  });
   // The course whose Learn-more modal is open; null keeps the dialog closed.
   // Deliberately page-local state: the modal never touches the URL or history.
   const [selectedCourse, setSelectedCourse] = useState<PathwayCourse | null>(null);
@@ -209,8 +242,9 @@ const PathwayDetailPage = () => {
             <Nav.Link
               key={id}
               href={`#${id}`}
-              className="pathway-detail-nav-link px-0"
+              className={`pathway-detail-nav-link px-0 ${activeSection === id ? 'active' : ''}`}
               aria-current={activeSection === id ? 'location' : undefined}
+              onClick={() => setActiveSection(id)}
             >
               {intl.formatMessage(message)}
             </Nav.Link>
@@ -232,15 +266,12 @@ const PathwayDetailPage = () => {
                   <Collapsible
                     key={course.id}
                     styling="card"
-                    title={(
-                      <span className="d-flex justify-content-between flex-wrap gap-2 flex-grow-1">
-                        <span className="font-weight-bold">{course.title}</span>
-                        <span className="text-muted">{course.summary}</span>
-                      </span>
-                    )}
+                    iconWhenClosed={<Icon src={AddIcon} />}
+                    iconWhenOpen={<Icon src={RemoveIcon} />}
+                    title={renderCourseTitle(course)}
                   >
                     <p className="mb-2">{course.courseAboutData.shortDescription}</p>
-                    <Button variant="outline-primary" size="sm" onClick={() => setSelectedCourse(course)}>
+                    <Button variant="primary" size="sm" onClick={() => setSelectedCourse(course)}>
                       {intl.formatMessage(messages.learnMoreBtn)}
                     </Button>
                   </Collapsible>
@@ -262,11 +293,24 @@ const PathwayDetailPage = () => {
             <section id="credentials" className="pathway-detail-section d-flex flex-column gap-3">
               <h2 className="h3 mb-0">{intl.formatMessage(messages.credentialsHeading)}</h2>
               <div id="pathway-credentials-list" className="pathway-detail-credentials">
-                {visibleCredentials.map((credential) => (
-                  <Card key={credential.id}>
-                    <Card.Header title={credential.title} subtitle={credential.courseTitle} size="sm" />
-                  </Card>
-                ))}
+                {visibleCredentials.map((credential) => {
+                  const isBadge = credential.title.toLowerCase().includes('badge');
+                  const credentialIcon = isBadge ? WorkspacePremium : CardMembershipIcon;
+                  return (
+                    <Card
+                      key={credential.id}
+                      className={`pathway-detail-credential-card ${isBadge
+                        ? 'pathway-detail-credential-card-badge'
+                        : 'pathway-detail-credential-card-certificate'}`}
+                    >
+                      <Card.Body className="d-flex flex-column align-items-center text-center p-4">
+                        <Icon src={credentialIcon} size="lg" className="pathway-detail-credential-icon mb-3" />
+                        <strong>{credential.title}</strong>
+                        <span className="small">{credential.courseTitle}</span>
+                      </Card.Body>
+                    </Card>
+                  );
+                })}
               </div>
               {pathway.credentials.length > INITIAL_VISIBLE_COUNT && (
                 <div>
@@ -283,17 +327,23 @@ const PathwayDetailPage = () => {
             </section>
             <section id="instructors" className="pathway-detail-section d-flex flex-column gap-3">
               <h2 className="h3 mb-0">{intl.formatMessage(messages.instructorsHeading)}</h2>
-              {pathway.instructors.map((instructor) => (
-                <div key={instructor.id} className="d-flex align-items-center gap-3">
-                  <Avatar alt="" size="sm" className="flex-shrink-0" />
-                  <div>
-                    <div className="font-weight-bold">{instructor.name}</div>
-                    <div>{instructor.role}</div>
-                  </div>
-                </div>
-              ))}
+              <Card className="pathway-detail-instructors-card">
+                <Card.Body className="d-flex flex-column gap-3 p-4">
+                  {pathway.instructors.map((instructor) => (
+                    <div key={instructor.id} className="pathway-detail-instructor-row d-flex align-items-center gap-3">
+                      <div className="pathway-detail-instructor-avatar" aria-hidden="true">
+                        {instructor.name.charAt(0)}
+                      </div>
+                      <div>
+                        <h3 className="h5 mb-0">{instructor.name}</h3>
+                        <div className="pathway-detail-instructor-role">{instructor.role}</div>
+                      </div>
+                    </div>
+                  ))}
+                </Card.Body>
+              </Card>
             </section>
-            <section id="faqs" className="pathway-detail-section d-flex flex-column">
+            <section id="faqs" className="pathway-detail-section d-flex flex-column gap-2">
               <h2 className="h3 mb-3">{intl.formatMessage(messages.faqsHeading)}</h2>
               {pathway.faqs.map((faq) => (
                 <Collapsible key={faq.id} styling="basic" className="pathway-detail-faq" title={faq.question}>
@@ -304,11 +354,14 @@ const PathwayDetailPage = () => {
             <section id="testimonials" className="pathway-detail-section d-flex flex-column gap-3">
               <h2 className="h3 mb-0">{intl.formatMessage(messages.testimonialsHeading)}</h2>
               {pathway.testimonials.map((testimonial) => (
-                <Card key={testimonial.id}>
+                <Card key={testimonial.id} className="pathway-detail-testimonial-card">
                   <Card.Body>
                     <figure className="m-0">
-                      <blockquote className="mb-2">{testimonial.quote}</blockquote>
-                      <figcaption className="font-weight-bold">{testimonial.attribution}</figcaption>
+                      <figcaption className="pathway-detail-testimonial-attribution">
+                        <span aria-hidden="true">“</span>
+                        {testimonial.attribution}
+                      </figcaption>
+                      <blockquote className="mb-0">{testimonial.quote}</blockquote>
                     </figure>
                   </Card.Body>
                 </Card>
@@ -319,6 +372,19 @@ const PathwayDetailPage = () => {
             <aside aria-label={intl.formatMessage(messages.factsAriaLabel)}>
               <Card>
                 <Card.Body className="p-0">
+                  <h3 id="pathway-detail-share-heading" className="h6 px-3 pt-3 mb-0">
+                    {intl.formatMessage(messages.shareHeading)}
+                  </h3>
+                  <div
+                    role="group"
+                    aria-labelledby="pathway-detail-share-heading"
+                    className="pathway-detail-share p-3"
+                  >
+                    <Stack direction="horizontal" gap={3}>
+                      <SocialLinks socialLinks={socialLinks} />
+                    </Stack>
+                  </div>
+                  <Card.Divider />
                   {pathway.facts.map((fact) => (
                     <div key={fact.label}>
                       <Stack direction="horizontal" className="justify-content-between flex-wrap p-3" gap={2}>
@@ -330,12 +396,6 @@ const PathwayDetailPage = () => {
                   ))}
                 </Card.Body>
               </Card>
-              <div className="mt-4">
-                <h3 className="h6 mb-2">{intl.formatMessage(messages.shareHeading)}</h3>
-                <Stack direction="horizontal" gap={3}>
-                  <SocialLinks socialLinks={socialLinks} />
-                </Stack>
-              </div>
             </aside>
           </Layout.Element>
         </Layout>

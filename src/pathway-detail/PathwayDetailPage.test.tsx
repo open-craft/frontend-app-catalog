@@ -114,6 +114,7 @@ const fireIntersections = (...entries: IntersectionObserverEntry[]) => {
 describe('PathwayDetailPage', () => {
   beforeEach(() => {
     mockIsEnrolled = undefined;
+    window.history.replaceState(null, '', '/pathways/pathway-1');
     window.testHistory = ['/pathways/pathway-1'];
     MockIntersectionObserver.instances = [];
     Object.defineProperty(global, 'IntersectionObserver', {
@@ -141,10 +142,20 @@ describe('PathwayDetailPage', () => {
       expect(screen.getByRole('heading', { name: message.defaultMessage })).toBeInTheDocument();
     });
 
-    // One presentational Paragon Avatar per instructor: empty alt (names are
-    // adjacent) and the default silhouette fallback (fixture has no images).
+    // Initial-letter avatars are decorative because each name is adjacent.
     const instructorsSection = getSection(messages.instructorsHeading.defaultMessage);
-    expect(instructorsSection.querySelectorAll('.pgn__avatar')).toHaveLength(DATA_ENGINEERING_PATHWAY.instructors.length);
+    expect(instructorsSection.querySelectorAll('.pathway-detail-instructor-avatar')).toHaveLength(
+      DATA_ENGINEERING_PATHWAY.instructors.length,
+    );
+    expect(within(instructorsSection).getAllByRole('heading', { level: 3 })).toHaveLength(
+      DATA_ENGINEERING_PATHWAY.instructors.length,
+    );
+
+    const factsAside = screen.getByRole('complementary', { name: messages.factsAriaLabel.defaultMessage });
+    expect(within(factsAside).getByRole('group', { name: messages.shareHeading.defaultMessage })).toBeInTheDocument();
+    expect(document.querySelectorAll('.pathway-detail-credential-card .pgn__icon')).toHaveLength(
+      INITIAL_VISIBLE_COUNT,
+    );
 
     [
       { message: messages.aboutNavLink, hash: '#about' },
@@ -170,6 +181,23 @@ describe('PathwayDetailPage', () => {
     expect(DATA_ENGINEERING_PATHWAY.faqs).toHaveLength(3);
     expect(DATA_ENGINEERING_PATHWAY.testimonials).toHaveLength(2);
     expect(DATA_ENGINEERING_PATHWAY.isEnrolled).toBe(false);
+  });
+
+  it('marks About as current by default when the URL has no hash', () => {
+    renderPathwayDetailPage();
+
+    const aboutLink = screen.getByRole('link', { name: messages.aboutNavLink.defaultMessage });
+    expect(aboutLink).toHaveClass('active');
+    expect(aboutLink).toHaveAttribute('aria-current', 'location');
+  });
+
+  it('marks the hash-selected section as the current navigation item', () => {
+    window.history.replaceState(null, '', '/pathways/pathway-1#about');
+    renderPathwayDetailPage();
+
+    const aboutLink = screen.getByRole('link', { name: messages.aboutNavLink.defaultMessage });
+    expect(aboutLink).toHaveClass('active');
+    expect(aboutLink).toHaveAttribute('aria-current', 'location');
   });
 
   it('substitutes any nonempty pathway ID into the fixture and rejects blank IDs', () => {
