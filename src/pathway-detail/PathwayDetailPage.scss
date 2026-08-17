@@ -1,3 +1,7 @@
+html:has(.pathway-detail-page) {
+  overflow-x: hidden;
+}
+
 .pathway-detail-page {
   // Height of the sticky section navigation, in px so the same value stays
   // valid as an IntersectionObserver rootMargin length (rootMargin accepts
@@ -6,6 +10,10 @@
   --pathway-detail-nav-height: 56px;
 
   .pathway-detail-hero {
+    background-color: var(--pgn-color-light-200);
+    box-shadow: 0 0 0 100vmax var(--pgn-color-light-200);
+    clip-path: inset(0 -100vmax);
+
     .pathway-detail-hero-content {
       @media (--pgn-size-breakpoint-min-width-lg) {
         flex: 1;
@@ -29,6 +37,11 @@
     position: sticky;
     top: 0;
     z-index: 10;
+    width: 100vw;
+    margin-left: calc((100% - 100vw) / 2);
+    padding-right: calc((100vw - 100%) / 2);
+    padding-left: calc((100vw - 100%) / 2);
+    box-sizing: border-box;
     height: var(--pathway-detail-nav-height);
     overflow-x: auto;
     column-gap: var(--pgn-spacing-spacer-4);
@@ -50,6 +63,10 @@
         border-bottom-color: var(--pgn-color-primary-base);
       }
     }
+  }
+
+  > .row {
+    background-color: var(--pgn-color-body-bg);
   }
 
   .pathway-detail-course-title {
@@ -98,7 +115,7 @@
   }
 
   .pathway-detail-credential-card {
-    min-height: 9.75rem;
+    min-height: 12.70rem;
     border: 0;
 
     .pathway-detail-credential-icon {

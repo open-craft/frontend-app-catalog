@@ -212,8 +212,8 @@ const PathwayDetailPage = () => {
   return (
     <>
       <Head title={pathway.name} />
-      <Container fluid={false} size="xl" className="pathway-detail-page py-5.5">
-        <header className="pathway-detail-hero d-flex flex-column flex-lg-row align-items-lg-start gap-3 bg-light-200">
+      <Container fluid={false} size="xl" className="pathway-detail-page">
+        <header className="pathway-detail-hero d-flex flex-column flex-lg-row align-items-lg-start gap-3 bg-light-200 py-6">
           <div className="pathway-detail-hero-content d-flex flex-column gap-3">
             <h1 className="h2 mb-1">{pathway.name}</h1>
             <Stack direction="horizontal" gap={3}>
@@ -237,7 +237,7 @@ const PathwayDetailPage = () => {
         <Nav
           as="nav"
           aria-label={intl.formatMessage(messages.sectionsNavLabel)}
-          className="pathway-detail-nav align-items-center gap-4 mt-4 mb-5"
+          className="pathway-detail-nav align-items-center gap-4 mt-1 mb-5"
         >
           {SECTION_NAV_ITEMS.map(({ id, message }) => (
             <Nav.Link
@@ -301,7 +301,7 @@ const PathwayDetailPage = () => {
                   return (
                     <Card
                       key={credential.id}
-                      className={`pathway-detail-credential-card ${isBadge
+                      className={`pathway-detail-credential-card justify-content-center bg-light-200 ${isBadge
                         ? 'pathway-detail-credential-card-badge'
                         : 'pathway-detail-credential-card-certificate'}`}
                     >
@@ -385,7 +385,7 @@ const PathwayDetailPage = () => {
                 <Card.Body className="p-0">
                   <div
                     role="group"
-                    aria-labelledby="pathway-detail-share-heading"
+                    aria-label={intl.formatMessage(messages.shareHeading)}
                     className="p-3"
                   >
                     <Stack direction="horizontal" gap={3} className="justify-content-center">
