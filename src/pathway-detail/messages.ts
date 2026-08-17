@@ -51,11 +51,6 @@ const messages = defineMessages({
     defaultMessage: 'About this Pathway',
     description: 'Heading for the About section.',
   },
-  coursesHeading: {
-    id: 'catalog.pathway-detail.courses-heading',
-    defaultMessage: 'Courses',
-    description: 'Heading for the courses list within the About section.',
-  },
   completeCoursesNote: {
     id: 'catalog.pathway-detail.complete-courses-note',
     defaultMessage: 'Complete {count, plural, one {this # course} other {these # courses}} in any order',

@@ -11,6 +11,7 @@ import {
   BsTwitterX as BsTwitterXIcon,
   CardMembership as CardMembershipIcon,
   Email as EmailIcon,
+  FormatQuote,
   Remove as RemoveIcon,
   WorkspacePremium,
 } from '@openedx/paragon/icons';
@@ -212,16 +213,16 @@ const PathwayDetailPage = () => {
     <>
       <Head title={pathway.name} />
       <Container fluid={false} size="xl" className="pathway-detail-page py-5.5">
-        <header className="pathway-detail-hero d-flex flex-column flex-lg-row align-items-lg-start gap-3">
+        <header className="pathway-detail-hero d-flex flex-column flex-lg-row align-items-lg-start gap-3 bg-light-200">
           <div className="pathway-detail-hero-content d-flex flex-column gap-3">
-            <div>
+            <h1 className="h2 mb-1">{pathway.name}</h1>
+            <Stack direction="horizontal" gap={3}>
               <Badge variant="light">{intl.formatMessage(messages.pathwayBadge)}</Badge>
-            </div>
-            <h1 className="h2 mb-0">{pathway.name}</h1>
-            <div className="text-muted">{pathway.organization}</div>
-            <p className="mb-0">{pathway.description}</p>
-            <div>
-              <Button disabled>
+              <div className="text-muted">{pathway.organization}</div>
+            </Stack>
+            <p className="mt-3">{pathway.description}</p>
+            <div className="mt-1">
+              <Button variant="primary" disabled>
                 {intl.formatMessage(pathway.isEnrolled ? messages.viewPathwayBtn : messages.enrollNowBtn)}
               </Button>
             </div>
@@ -236,7 +237,7 @@ const PathwayDetailPage = () => {
         <Nav
           as="nav"
           aria-label={intl.formatMessage(messages.sectionsNavLabel)}
-          className="pathway-detail-nav align-items-center gap-4 mt-4"
+          className="pathway-detail-nav align-items-center gap-4 mt-4 mb-5"
         >
           {SECTION_NAV_ITEMS.map(({ id, message }) => (
             <Nav.Link
@@ -252,18 +253,19 @@ const PathwayDetailPage = () => {
         </Nav>
         <Layout {...PAGE_LAYOUT}>
           <Layout.Element className="d-flex flex-column gap-5 mt-4 mb-4 mb-lg-0">
+          <Stack direction="vertical" gap={5}>
             <section id="about" className="pathway-detail-section d-flex flex-column gap-3">
-              <h2 className="h3 mb-0">{intl.formatMessage(messages.aboutHeading)}</h2>
-              {pathway.about.map((paragraph) => (
-                <p key={paragraph} className="mb-0">{paragraph}</p>
+              <h2 className="h3 mb-2">{intl.formatMessage(messages.aboutHeading)}</h2>
+              {pathway.about.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
               ))}
-              <p className="font-weight-bold mb-0">
+              <strong className="mt-3">
                 {intl.formatMessage(messages.completeCoursesNote, { count: pathway.courses.length })}
-              </p>
-              <h3 className="h4 mt-2">{intl.formatMessage(messages.coursesHeading)}</h3>
-              <div id="pathway-courses-list" className="d-flex flex-column gap-2">
+              </strong>
+              <Stack id="pathway-courses-list" direction="vertical" gap={2}>
                 {visibleCourses.map((course) => (
                   <Collapsible
+                    className="py-2 px-3"
                     key={course.id}
                     styling="card"
                     iconWhenClosed={<Icon src={AddIcon} />}
@@ -276,7 +278,7 @@ const PathwayDetailPage = () => {
                     </Button>
                   </Collapsible>
                 ))}
-              </div>
+              </Stack>
               {pathway.courses.length > INITIAL_VISIBLE_COUNT && (
                 <div>
                   <Button
@@ -291,7 +293,7 @@ const PathwayDetailPage = () => {
               )}
             </section>
             <section id="credentials" className="pathway-detail-section d-flex flex-column gap-3">
-              <h2 className="h3 mb-0">{intl.formatMessage(messages.credentialsHeading)}</h2>
+              <h2 className="h3 mb-3">{intl.formatMessage(messages.credentialsHeading)}</h2>
               <div id="pathway-credentials-list" className="pathway-detail-credentials">
                 {visibleCredentials.map((credential) => {
                   const isBadge = credential.title.toLowerCase().includes('badge');
@@ -326,61 +328,67 @@ const PathwayDetailPage = () => {
               )}
             </section>
             <section id="instructors" className="pathway-detail-section d-flex flex-column gap-3">
-              <h2 className="h3 mb-0">{intl.formatMessage(messages.instructorsHeading)}</h2>
+              <h2 className="h3 mb-3">{intl.formatMessage(messages.instructorsHeading)}</h2>
               <Card className="pathway-detail-instructors-card">
                 <Card.Body className="d-flex flex-column gap-3 p-4">
                   {pathway.instructors.map((instructor) => (
-                    <div key={instructor.id} className="pathway-detail-instructor-row d-flex align-items-center gap-3">
+                    <Stack direction="horizontal" gap={3} key={instructor.id} className="pathway-detail-instructor-row d-flex align-items-center gap-3">
                       <div className="pathway-detail-instructor-avatar" aria-hidden="true">
                         {instructor.name.charAt(0)}
                       </div>
                       <div>
-                        <h3 className="h5 mb-0">{instructor.name}</h3>
-                        <div className="pathway-detail-instructor-role">{instructor.role}</div>
+                        <h3 className="mb-0">{instructor.name}</h3>
+                        <span className="x-small text-muted">{instructor.role}</span>
                       </div>
-                    </div>
+                    </Stack>
                   ))}
                 </Card.Body>
               </Card>
             </section>
             <section id="faqs" className="pathway-detail-section d-flex flex-column gap-2">
               <h2 className="h3 mb-3">{intl.formatMessage(messages.faqsHeading)}</h2>
+              <Stack direction="vertical" gap={2}>
               {pathway.faqs.map((faq) => (
                 <Collapsible key={faq.id} styling="basic" className="pathway-detail-faq" title={faq.question}>
                   <p className="mb-0">{faq.answer}</p>
                 </Collapsible>
               ))}
+              </Stack>
             </section>
             <section id="testimonials" className="pathway-detail-section d-flex flex-column gap-3">
-              <h2 className="h3 mb-0">{intl.formatMessage(messages.testimonialsHeading)}</h2>
+              <h2 className="h3 mb-3">{intl.formatMessage(messages.testimonialsHeading)}</h2>
+              <Stack direction="vertical" gap={2}>
               {pathway.testimonials.map((testimonial) => (
-                <Card key={testimonial.id} className="pathway-detail-testimonial-card">
+                <Card key={testimonial.id} className="shadow-none border border-light-300 bg-light-200 p-4">
                   <Card.Body>
                     <figure className="m-0">
                       <figcaption className="pathway-detail-testimonial-attribution">
-                        <span aria-hidden="true">“</span>
-                        {testimonial.attribution}
+                      <Stack direction="horizontal" gap={2} className="mb-1 align-items-start">
+                        <Icon src={FormatQuote} className="text-info" />
+                        <Stack direction="vertical" gap={2} className="mb-1">
+                          <strong>{testimonial.attribution}</strong>
+                          <blockquote className="mb-0">{testimonial.quote}</blockquote>
+                        </Stack>
+                        </Stack>
                       </figcaption>
-                      <blockquote className="mb-0">{testimonial.quote}</blockquote>
                     </figure>
                   </Card.Body>
                 </Card>
               ))}
+              </Stack>
             </section>
+            </Stack>
           </Layout.Element>
           <Layout.Element className="align-self-start mt-lg-4">
             <aside aria-label={intl.formatMessage(messages.factsAriaLabel)}>
               <Card>
                 <Card.Body className="p-0">
-                  <h3 id="pathway-detail-share-heading" className="h6 px-3 pt-3 mb-0">
-                    {intl.formatMessage(messages.shareHeading)}
-                  </h3>
                   <div
                     role="group"
                     aria-labelledby="pathway-detail-share-heading"
-                    className="pathway-detail-share p-3"
+                    className="p-3"
                   >
-                    <Stack direction="horizontal" gap={3}>
+                    <Stack direction="horizontal" gap={3} className="justify-content-center">
                       <SocialLinks socialLinks={socialLinks} />
                     </Stack>
                   </div>

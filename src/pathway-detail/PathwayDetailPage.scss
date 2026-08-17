@@ -150,11 +150,6 @@
     color: #411E65;
   }
 
-  .pathway-detail-instructor-role {
-    color: var(--pgn-color-text-muted);
-    font-size: .75rem;
-  }
-
   .pathway-detail-instructor-row h3 {
     font-size: 1rem;
   }
@@ -173,34 +168,6 @@
     }
   }
 
-  .pathway-detail-testimonial-card {
-    border: 0;
-    background-color: var(--pgn-color-light-100);
-
-    & + .pathway-detail-testimonial-card {
-      margin-top: var(--pgn-spacing-spacer-3);
-    }
-  }
-
-  .pathway-detail-testimonial-attribution {
-    display: flex;
-    align-items: center;
-    gap: var(--pgn-spacing-spacer-1);
-    color: var(--pgn-color-action-default-secondary-base);
-    font-weight: 600;
-
-    > span {
-      color: var(--pgn-color-action-default-secondary-base);
-      font-size: 1.75rem;
-      line-height: 1;
-    }
-  }
-
-  .pathway-detail-testimonial-card blockquote {
-    margin-left: 2rem;
-    color: var(--pgn-color-text-muted);
-    font-style: italic;
-  }
 }
 
 // The modal is portaled to <body>, so its rules live outside the page scope.
