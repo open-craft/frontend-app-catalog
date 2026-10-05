@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 import {
   Card, useMediaQuery, breakpoints, Badge,
 } from '@openedx/paragon';
-import { resolveRouteByRole, useIntl } from '@openedx/frontend-base';
+import { getAppConfig, resolveRouteByRole, useIntl } from '@openedx/frontend-base';
 
 import noCourseImg from '@src/assets/images/no-course-image.svg';
-import { courseAboutRole } from '@src/constants';
+import { appId, courseAboutRole } from '@src/constants';
 
 import type { CourseCardProps } from './types';
 import messages from './messages';
@@ -50,6 +50,13 @@ export const CourseCard = ({
         srcAlt={`${courseName} ${courseNumber}`}
         skeletonDuringImageLoad
       />
+      {!isLoading && getAppConfig(appId).ENABLE_PATHWAY_PILOT_UI === true && (
+        <Badge
+          className="catalog-card-badge course-card-badge position-absolute py-1 px-2"
+        >
+          {intl.formatMessage(messages.course)}
+        </Badge>
+      )}
       <Card.Header
         title={courseName}
         subtitle={(
