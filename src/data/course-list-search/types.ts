@@ -1,40 +1,32 @@
-export interface CourseListSearchResponse {
+import type { CourseData } from '@src/generic/course-card/types';
+
+/** Shared envelope for search responses (everything except the result list). */
+export interface SearchResponseBase {
   took: number;
   total: number;
-  results: {
-    id: string;
-    index: string;
-    type: string;
-    title: string;
-    data: {
-      id: string;
-      course: string;
-      start: string;
-      imageUrl: string;
-      org: string;
-      orgImageUrl?: string;
-      advertisedStart?: string;
-      content: {
-        displayName: string;
-        overview?: string;
-        number?: string;
-      };
-      number: string;
-      modes: string[];
-      language: string;
-      catalogVisibility: string;
-    };
-  }[];
   aggs: Record<string, {
     terms: Record<string, number>;
+    /** Optional slug -> display label map (category facet enrichment). */
+    labels?: Record<string, string>;
     total: number;
     other: number;
   }>;
   maxScore: number;
 }
 
+export interface CourseListSearchResponse extends SearchResponseBase {
+  results: {
+    id: string;
+    index: string;
+    type: string;
+    title: string;
+    data: CourseData;
+  }[];
+}
+
 export type Aggregations = Record<string, {
   terms: Record<string, number>;
+  labels?: Record<string, string>;
 }>;
 
 export interface CourseListSearchParams {

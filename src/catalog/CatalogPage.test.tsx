@@ -630,7 +630,7 @@ describe('CatalogPage', () => {
       const courseCard = courseCards[index];
 
       expect(within(courseCard).getByText(course.data.content.displayName)).toBeInTheDocument();
-      expect(within(courseCard).getByText(course.data.content.number)).toBeInTheDocument();
+      expect(within(courseCard).getByText(course.data.content.number ?? '')).toBeInTheDocument();
       expect(within(courseCard).getByText(course.data.org)).toBeInTheDocument();
       expect(courseCard).toHaveAttribute('href', `/courses/${course.data.course}/about`);
     });

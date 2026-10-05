@@ -205,7 +205,7 @@ describe('HomePage', () => {
         const cardContent = within(card);
 
         expect(cardContent.getByText(
-          courseCardMessages.startDate.defaultMessage.replace('{startDate}', course.data.advertisedStart),
+          courseCardMessages.startDate.defaultMessage.replace('{startDate}', course.data.advertisedStart ?? ''),
         )).toBeInTheDocument();
       });
     });
