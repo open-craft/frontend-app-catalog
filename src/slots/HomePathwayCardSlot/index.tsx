@@ -13,9 +13,10 @@ export interface HomePathwayCardSlotProps {
   imageUrl?: string;
   startDate?: string;
   advertisedStart?: string;
-  type?: string;
-  typeBackgroundColor?: string;
-  typeTextColor?: string;
+  category?: string;
+  categoryLabel?: string;
+  categoryBackgroundColor?: string;
+  categoryTextColor?: string;
 }
 
 const HomePathwayCardSlot = ({
@@ -38,9 +39,10 @@ const HomePathwayCardSlot = ({
     imageUrl: pathwayData?.data.imageUrl,
     startDate: pathwayData?.data.start,
     advertisedStart: pathwayData?.data.advertisedStart,
-    type: pathwayData?.data.type,
-    typeBackgroundColor: pathwayData?.data.typeBackgroundColor,
-    typeTextColor: pathwayData?.data.typeTextColor,
+    category: pathwayData?.data.category,
+    categoryLabel: pathwayData?.data.categoryLabel,
+    categoryBackgroundColor: pathwayData?.data.categoryBackgroundColor,
+    categoryTextColor: pathwayData?.data.categoryTextColor,
   };
 
   return (

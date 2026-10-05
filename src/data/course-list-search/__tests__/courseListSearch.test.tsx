@@ -61,6 +61,69 @@ describe('Course List Search Data Layer', () => {
       await expect(fetchCourseListSearch({})).rejects.toThrow('API Error');
     });
 
+    it('should preserve kebab-case aggregation term keys and labels while camelCasing structural fields', async () => {
+      const mockPost = jest.fn().mockResolvedValue({
+        data: {
+          took: 1,
+          total: 2,
+          max_score: 2.0,
+          results: [
+            {
+              id: 'course-v1:Test+CS101+2024',
+              type: 'course',
+              data: {
+                content: { display_name: 'Test Course' },
+                image_url: '/image.jpg',
+                org: 'Test',
+              },
+            },
+          ],
+          aggs: {
+            category: {
+              terms: {
+                'professional-certificate': 1,
+                'computer-science': 1,
+              },
+              labels: {
+                'professional-certificate': 'Professional Certificate',
+              },
+              total: 2,
+              other: 0,
+            },
+            org: {
+              terms: {
+                'open-edx': 1,
+              },
+              total: 1,
+              other: 0,
+            },
+          },
+        },
+      });
+      mockGetAuthenticatedHttpClient.mockReturnValue({ post: mockPost });
+
+      const result = await fetchCourseListSearch({});
+
+      // Dynamic slug keys and labels must be preserved verbatim.
+      expect(result.aggs.category.terms).toEqual({
+        'professional-certificate': 1,
+        'computer-science': 1,
+      });
+      expect(result.aggs.category.labels).toEqual({
+        'professional-certificate': 'Professional Certificate',
+      });
+      expect(result.aggs.org.terms).toEqual({ 'open-edx': 1 });
+
+      // Structural fields are still camelCased.
+      expect(result.maxScore).toBe(2.0);
+      const firstResult = result.results[0];
+      expect(firstResult.type).toBe('course');
+      if (firstResult.type === 'course') {
+        expect(firstResult.data.content.displayName).toBe('Test Course');
+        expect(firstResult.data.imageUrl).toBe('/image.jpg');
+      }
+    });
+
     it.each([
       ['null, as the LMS sends for an unset setting', null],
       ['a numeric string', '10'],

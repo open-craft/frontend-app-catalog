@@ -103,6 +103,46 @@ describe('utils', () => {
       });
     });
 
+    it('should use the aggregation labels for category filter choice names', () => {
+      const aggs = {
+        category: {
+          terms: { 'professional-certificate': 2, 'computer-science': 1 },
+          labels: { 'professional-certificate': 'Professional Certificate' },
+        },
+      };
+
+      const result = transformAggregationsToFilterChoices(aggs, intl);
+      const categoryColumn = result.find(col => col.accessor === 'category');
+
+      expect(categoryColumn?.filterChoices).toEqual([
+        {
+          name: 'Professional Certificate',
+          number: 2,
+          value: 'professional-certificate',
+        },
+        {
+          name: 'Computer-science',
+          number: 1,
+          value: 'computer-science',
+        },
+      ]);
+    });
+
+    it('should fall back to the term key when the category has no label', () => {
+      const aggs = {
+        category: {
+          terms: { bootcamp: 1 },
+        },
+      };
+
+      const result = transformAggregationsToFilterChoices(aggs, intl);
+      const categoryColumn = result.find(col => col.accessor === 'category');
+
+      expect(categoryColumn?.filterChoices).toEqual([
+        { name: 'Bootcamp', number: 1, value: 'bootcamp' },
+      ]);
+    });
+
     it('should use locale for language display names', () => {
       const aggs = {
         language: {
