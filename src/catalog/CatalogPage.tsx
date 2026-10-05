@@ -9,7 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 import { getStringConfig } from '@src/config';
 import { DEFAULT_PAGE_SIZE } from '@src/data/course-list-search/constants';
 import { useCourseListSearch } from '@src/data/course-list-search/hooks';
-import CourseCatalogIntroSlot from '@src/slots/CourseCatalogIntroSlot';
+import ExploreIntroSlot from '@src/slots/ExploreIntroSlot';
 import { CourseCatalogDataTableSlot } from '@src/slots/CourseCatalogDataTableSlots';
 import CourseCatalogSearchFieldSlot from '@src/slots/CourseCatalogSearchFieldSlot';
 import { useDebouncedSearchInput } from './hooks/useDebouncedSearchInput';
@@ -104,7 +104,7 @@ const CatalogPage = () => {
         </title>
       </Helmet>
       <Container fluid={false} size="xl" className="pt-5.5 mb-6">
-        <CourseCatalogIntroSlot searchString={searchString} courseDataResultsLength={courseData?.results?.length} />
+        <ExploreIntroSlot searchString={searchString} resultsCount={courseData?.results?.length} />
         {hasCourses ? (
           <>
             <CourseCatalogSearchFieldSlot

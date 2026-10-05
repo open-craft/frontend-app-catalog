@@ -79,6 +79,15 @@ export const mockCourseListSearchResponse = {
     },
   ],
   aggs: {
+    category: {
+      terms: {
+        course: 1,
+        bootcamp: 1,
+        tutorial: 1,
+      },
+      total: 3,
+      other: 0,
+    },
     language: {
       terms: {
         en: 3,

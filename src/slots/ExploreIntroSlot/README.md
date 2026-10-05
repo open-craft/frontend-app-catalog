@@ -1,25 +1,29 @@
-# Course Catalog Intro Slot
+# Explore Intro Slot
 
-### Slot ID: `org.openedx.frontend.slot.catalog.courseCatalogIntro.v1`
+### Slot ID: `org.openedx.frontend.slot.catalog.exploreIntro.v1`
 
 ### Slot Props
 
-* `searchString: string` — the current search query string entered in the course catalog search field.
-* `courseDataResultsLength?: number` — the number of results on the current search page (undefined until the search response arrives).
+* `searchString: string` — the current search query string entered in the catalog search field.
+* `resultsCount?: number` — the number of results on the current search page (undefined until the search response arrives).
+* `courseDataResultsLength?: number` — **deprecated** alias of `resultsCount`, kept for backward compatibility with plugins written against the old prop name. Use `resultsCount` in new code.
 
 ## Description
 
-This slot is used to replace/modify/hide the entire Course catalog page intro section.
+This slot is used to replace/modify/hide the entire Explore page intro section.
+
+The Explore page lists courses and pathways together, so the intro heading reads
+"Explore" rather than "Explore courses" when no search is active.
 
 ## Examples
 
 ### Default content
 
-![Course catalog page intro slot with default content](./images/screenshot_default.png)
+![Explore page intro slot with default content](./images/screenshot_default.png)
 
 ### Wrapped with a red border (custom layout)
 
-![Course catalog intro wrapped in a dashed red border](./images/screenshot_custom_wrap.png)
+![Explore intro wrapped in a dashed red border](./images/screenshot_custom_wrap.png)
 
 To keep the default content but wrap it in extra markup, replace the slot's **layout**.
 
@@ -44,7 +48,7 @@ To keep the default content but wrap it in extra markup, replace the slot's **la
        ...catalogApp,
 +      slots: [
 +        {
-+          slotId: 'org.openedx.frontend.slot.catalog.courseCatalogIntro.v1',
++          slotId: 'org.openedx.frontend.slot.catalog.exploreIntro.v1',
 +          op: LayoutOperationTypes.REPLACE,
 +          component: BorderedLayout,
 +        },
@@ -56,9 +60,9 @@ To keep the default content but wrap it in extra markup, replace the slot's **la
 
 ### Replaced with a simple custom component
 
-![🕵️ in Course catalog page intro slot](./images/screenshot_custom_simple.png)
+![🔎 in Explore page intro slot](./images/screenshot_custom_simple.png)
 
-Add the following to your site config to replace the Course catalog intro entirely (in this case with a centered "🕵️" `h1` tag).
+Add the following to your site config to replace the Explore intro entirely (in this case with a centered "🔎" `h1` tag).
 
 ```diff
 -import { EnvironmentTypes, SiteConfig, ... } from '@openedx/frontend-base';
@@ -72,11 +76,11 @@ Add the following to your site config to replace the Course catalog intro entire
        ...catalogApp,
 +      slots: [
 +        {
-+          slotId: 'org.openedx.frontend.slot.catalog.courseCatalogIntro.v1',
-+          id: 'customCourseCatalogIntro',
++          slotId: 'org.openedx.frontend.slot.catalog.exploreIntro.v1',
++          id: 'customExploreIntro',
 +          op: WidgetOperationTypes.REPLACE,
 +          relatedId: 'defaultContent',
-+          element: <h1 style={{ textAlign: 'center' }}>🕵️</h1>,
++          element: <h1 style={{ textAlign: 'center' }}>🔎</h1>,
 +        },
 +      ],
      },
@@ -86,27 +90,27 @@ Add the following to your site config to replace the Course catalog intro entire
 
 ### Replaced with a custom component using the slot's props
 
-![Alert component reading searchString and courseDataResultsLength](./images/screenshot_custom_with_props.png)
+![Alert component reading searchString and resultsCount](./images/screenshot_custom_with_props.png)
 
-Add the following to your site config to replace the Course catalog intro with an alert component that reads the slot's `searchString` and `courseDataResultsLength` props.
+Add the following to your site config to replace the Explore intro with an alert component that reads the slot's `searchString` and `resultsCount` props.
 
 ```diff
 -import { EnvironmentTypes, SiteConfig, ... } from '@openedx/frontend-base';
 +import { EnvironmentTypes, WidgetOperationTypes, SiteConfig, ... } from '@openedx/frontend-base';
 
 -import { catalogApp } from './src';
-+import { catalogApp, type CourseCatalogIntroSlotProps } from './src';
++import { catalogApp, type ExploreIntroSlotPluginProps } from './src';
 
 +import { Alert, Stack, Chip } from '@openedx/paragon';
 +
  import '@openedx/frontend-base/shell/style';
 
-+const customCatalogIntro = ({ searchString, courseDataResultsLength }: CourseCatalogIntroSlotProps) => (
++const customExploreIntro = ({ searchString, resultsCount }: ExploreIntroSlotPluginProps) => (
 +  <Alert variant="info">
 +    <Alert.Heading>Search information</Alert.Heading>
 +    <Stack direction="horizontal" gap={3}>
 +      <Chip>Search query: {searchString || '(none)'}</Chip>
-+      <Chip>Found on page: {courseDataResultsLength ?? 0}</Chip>
++      <Chip>Found on page: {resultsCount ?? 0}</Chip>
 +    </Stack>
 +  </Alert>
 +);
@@ -119,11 +123,11 @@ Add the following to your site config to replace the Course catalog intro with a
        ...catalogApp,
 +      slots: [
 +        {
-+          slotId: 'org.openedx.frontend.slot.catalog.courseCatalogIntro.v1',
-+          id: 'customCourseCatalogIntro',
++          slotId: 'org.openedx.frontend.slot.catalog.exploreIntro.v1',
++          id: 'customExploreIntro',
 +          op: WidgetOperationTypes.REPLACE,
 +          relatedId: 'defaultContent',
-+          component: customCatalogIntro,
++          component: customExploreIntro,
 +        },
 +      ],
      },

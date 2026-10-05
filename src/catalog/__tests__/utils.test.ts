@@ -15,6 +15,7 @@ describe('utils', () => {
         organizations: messages.organizations.defaultMessage,
         languages: messages.languages.defaultMessage,
         courseTypes: messages.courseTypes.defaultMessage,
+        categories: messages.categories.defaultMessage,
       },
     });
 
@@ -31,7 +32,7 @@ describe('utils', () => {
       const { aggs } = mockCourseListSearchResponse;
       const result = transformAggregationsToFilterChoices(aggs, intl);
 
-      expect(result).toHaveLength(Object.keys(aggs).length); // language, modes, org
+      expect(result).toHaveLength(Object.keys(aggs).length); // category, language, modes, org
       expect(result.every(column => column.Filter === CheckboxFilter)).toBe(true);
       expect(result.every(column => column.filter === 'includesValue')).toBe(true);
     });
@@ -46,6 +47,7 @@ describe('utils', () => {
       }, {});
 
       expect(headersMap).toEqual({
+        category: messages.categories.defaultMessage,
         language: messages.languages.defaultMessage,
         modes: messages.courseTypes.defaultMessage,
         org: messages.organizations.defaultMessage,
