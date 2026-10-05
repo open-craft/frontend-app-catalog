@@ -5,6 +5,6 @@
 @use "./generic/cards";
 
 :root {
-  --catalog-course-badge-background-color: #DBD0FE;
-  --catalog-course-badge-color: #411E65;
+  --catalog-course-badge-background-color: var(--pgn-color-light-500);
+  --catalog-course-badge-color: black;
 }
