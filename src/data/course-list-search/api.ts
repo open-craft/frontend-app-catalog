@@ -5,7 +5,7 @@ import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE_INDEX } from './constants';
 import { getCourseListSearchUrl } from './urls';
 import { addFiltersToFormData } from './utils';
 
-import type { CourseListSearchResponse } from './types';
+import type { CatalogListSearchMixedResponse } from './types';
 
 /**
  * Coerces a pagination value into an integer the search API can parse.
@@ -22,7 +22,9 @@ const toPaginationValue = (value: unknown, fallback: number, minimum: number): n
  * Fetches course list search data from the API.
  * @async
  */
-export const fetchCourseListSearch = async (params): Promise<CourseListSearchResponse> => {
+export const fetchCourseListSearch = async (
+  params,
+): Promise<CatalogListSearchMixedResponse> => {
   const {
     enableCourseSortingByStartDate = false,
     filters = {},

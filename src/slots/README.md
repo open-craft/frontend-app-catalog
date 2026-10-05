@@ -32,6 +32,7 @@ for naming conventions and lifecycle details.
 - [`org.openedx.frontend.slot.catalog.courseCatalogDataTableControlBar.v1`](./CourseCatalogDataTableSlots/CourseCatalogDataTableControlBarSlot/)
 - [`org.openedx.frontend.slot.catalog.courseCatalogDataTableCardView.v1`](./CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot/)
 - [`org.openedx.frontend.slot.catalog.courseCatalogDataTableCourseCard.v1`](./CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot/CourseCatalogDataTableCourseCardSlot/)
+- [`org.openedx.frontend.slot.catalog.courseCatalogDataTablePathwayCard.v1`](./CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot/CourseCatalogDataTablePathwayCardSlot/)
 - [`org.openedx.frontend.slot.catalog.courseCatalogDataTableTableFooter.v1`](./CourseCatalogDataTableSlots/CourseCatalogDataTableTableFooterSlot/)
 
 ## Course About page

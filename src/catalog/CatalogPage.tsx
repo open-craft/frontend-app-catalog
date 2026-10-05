@@ -8,7 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { getStringConfig } from '@src/config';
 import { DEFAULT_PAGE_SIZE } from '@src/data/course-list-search/constants';
-import { useCourseListSearch } from '@src/data/course-list-search/hooks';
+import { useCatalogListSearch } from '@src/data/course-list-search/hooks';
 import ExploreIntroSlot from '@src/slots/ExploreIntroSlot';
 import { CourseCatalogDataTableSlot } from '@src/slots/CourseCatalogDataTableSlots';
 import CourseCatalogSearchFieldSlot from '@src/slots/CourseCatalogSearchFieldSlot';
@@ -28,7 +28,7 @@ const CatalogPage = () => {
     isError,
     fetchData,
     isFetching,
-  } = useCourseListSearch({ searchString: searchQuery });
+  } = useCatalogListSearch({ searchString: searchQuery });
 
   const {
     pageIndex,

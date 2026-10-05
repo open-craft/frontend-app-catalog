@@ -6,8 +6,9 @@ import { getAppConfig, getSiteConfig, IntlProvider } from '@openedx/frontend-bas
 import { appId, DATE_FORMAT_OPTIONS } from '@src/constants';
 import genericMessages from '@src/generic/video-modal/messages';
 import courseCardMessages from '@src/generic/course-card/messages';
-import { useCourseListSearch } from '@src/data/course-list-search/hooks';
+import { useCatalogListSearch } from '@src/data/course-list-search/hooks';
 import { mockCourseListSearchResponse } from '@src/__mocks__';
+import type { CatalogListSearchMixedResult } from '@src/data/course-list-search/types';
 import {
   DEFAULT_VIDEO_MODAL_HEIGHT, IFRAME_FEATURE_POLICY,
 } from '../constants';
@@ -26,12 +27,22 @@ jest.mock('@openedx/frontend-base', () => ({
 }));
 
 jest.mock('@src/data/course-list-search/hooks', () => ({
-  useCourseListSearch: jest.fn(),
+  useCatalogListSearch: jest.fn(),
 }));
 
 const { getAppConfig: actualGetAppConfig } = jest.requireActual('@openedx/frontend-base');
 const mockedGetAppConfig = getAppConfig as jest.Mock;
-const mockCourseListSearch = useCourseListSearch as jest.Mock;
+const mockCourseListSearch = useCatalogListSearch as jest.Mock;
+
+/**
+ * The search response can mix courses and pathways; narrow to the course arm
+ * before reading course-only fields off `data`.
+ */
+const isCourseResult = (
+  result: CatalogListSearchMixedResult,
+): result is CatalogListSearchMixedResult & { type: 'course' | '_doc' } => result.type !== 'pathway';
+
+const courseResults = () => mockCourseListSearchResponse.results.filter(isCourseResult);
 
 const formatDateForTest = (dateString: string) => new Intl.DateTimeFormat(
   'en-US',
@@ -136,7 +147,7 @@ describe('HomePage', () => {
       });
 
       const courseCards = screen.getAllByRole('link');
-      expect(courseCards.length).toBe(mockCourseListSearchResponse.results.length);
+      expect(courseCards.length).toBe(courseResults().length);
     });
 
     it('renders course cards with correct links', async () => {
@@ -149,7 +160,7 @@ describe('HomePage', () => {
       const courseCards = screen.getAllByRole('link');
 
       courseCards.forEach((card, index) => {
-        const course = mockCourseListSearchResponse.results[index];
+        const course = courseResults()[index];
         expect(card).toHaveAttribute('href', `/courses/${course.id}/about`);
       });
     });
@@ -164,7 +175,7 @@ describe('HomePage', () => {
       const courseCards = screen.getAllByRole('link');
 
       courseCards.forEach((card, index) => {
-        const course = mockCourseListSearchResponse.results[index];
+        const course = courseResults()[index];
         const cardContent = within(card);
 
         const courseImage = cardContent.getByAltText(`${course.data.content.displayName} ${course.data.number}`);
@@ -182,7 +193,7 @@ describe('HomePage', () => {
       const courseCards = screen.getAllByRole('link');
 
       courseCards.forEach((card, index) => {
-        const course = mockCourseListSearchResponse.results[index];
+        const course = courseResults()[index];
         const cardContent = within(card);
 
         expect(cardContent.getByText(course.data.content.displayName)).toBeInTheDocument();
@@ -201,7 +212,7 @@ describe('HomePage', () => {
       const courseCards = screen.getAllByRole('link');
 
       courseCards.forEach((card, index) => {
-        const course = mockCourseListSearchResponse.results[index];
+        const course = courseResults()[index];
         const cardContent = within(card);
 
         expect(cardContent.getByText(
@@ -213,7 +224,7 @@ describe('HomePage', () => {
     it('renders formatted start date when advertisedStart is not available', async () => {
       const mockResponseWithoutAdvertisedStart = {
         ...mockCourseListSearchResponse,
-        results: mockCourseListSearchResponse.results.map(course => ({
+        results: courseResults().map(course => ({
           ...course,
           data: {
             ...course.data,
