@@ -138,6 +138,10 @@ These are the all the fields the app reads:
      - Purpose
    * - ``ENABLE_COURSE_DISCOVERY``
      - Show the Discover / Explore links in the header.
+   * - ``ENABLE_PATHWAY_PILOT_UI``
+     - Show pathway cards and the course/pathway badges (default
+       ``false``). The pilot is off until the backend serves
+       pathway data.
    * - ``ENABLE_PROGRAMS``
      - Show the Programs link in the header.
    * - ``ENABLE_COURSE_SORTING_BY_START_DATE``

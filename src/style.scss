@@ -2,3 +2,9 @@
 @use "./assets/scss/animations";
 @use "./home/components/home-banner";
 @use "./course-about/CourseAboutPage";
+@use "./generic/cards";
+
+:root {
+  --catalog-course-badge-background-color: #DBD0FE;
+  --catalog-course-badge-color: #411E65;
+}

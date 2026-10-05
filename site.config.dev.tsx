@@ -23,6 +23,9 @@ const siteConfig: SiteConfig = {
       config: {
         ENABLE_COURSE_DISCOVERY: true,
         ENABLE_COURSE_SORTING_BY_START_DATE: true,
+        // Set to true to render pathway cards and badges; the backend does not
+        // serve pathway data yet, so this stays off by default.
+        ENABLE_PATHWAY_PILOT_UI: false,
         INFO_EMAIL: 'support@example.com',
       },
     },
