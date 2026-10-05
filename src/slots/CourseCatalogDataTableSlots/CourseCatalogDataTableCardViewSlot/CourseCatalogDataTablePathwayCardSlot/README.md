@@ -1,6 +1,6 @@
-# Home Pathway Card Slot
+# Course Catalog Data Table Pathway Card Slot
 
-### Slot ID: `org.openedx.frontend.slot.catalog.homePathwayCard.v1`
+### Slot ID: `org.openedx.frontend.slot.catalog.courseCatalogDataTablePathwayCard.v1`
 
 ### Slot Props
 
@@ -19,18 +19,20 @@
 
 ## Description
 
-This slot is used to replace/modify/hide an entire Home page pathway card.
+This slot is used to replace/modify/hide an entire Course catalog page data table
+pathway card.
 
-Nothing is rendered while ``ENABLE_PATHWAY_PILOT_UI`` is unset or not exactly
-``true``: the slot returns ``null`` before it reaches this component, so the
-``Slot`` is not offered at all. Turn the flag on in the site's catalog app
-config (in this repo, ``site.config.dev.tsx``) to exercise it.
+The catalog's card view renders one card per search result, so only pathway
+results reach this slot; courses go to
+[`courseCatalogDataTableCourseCard`](../CourseCatalogDataTableCourseCardSlot/).
+The card and its style follow the shared badge styling, and nothing is rendered
+while ``ENABLE_PATHWAY_PILOT_UI`` is unset or not exactly ``true``.
 
 ## Examples
 
 ### Replaced with a simple custom component
 
-Add the following to your site config to replace the Home page pathway card entirely (in this case with a large "🛤️" `div`). The diff below is against this app's `site.config.dev.tsx`.
+Add the following to your site config to replace the pathway card entirely (in this case with a large "🛤️" `div`). The diff below is against this app's `site.config.dev.tsx`.
 
 ```diff
 -import { EnvironmentTypes, SiteConfig, ... } from '@openedx/frontend-base';
@@ -42,13 +44,10 @@ Add the following to your site config to replace the Home page pathway card enti
      // ...
      {
        ...catalogApp,
-+      config: {
-+        ENABLE_PATHWAY_PILOT_UI: true,
-+      },
 +      slots: [
 +        {
-+          slotId: 'org.openedx.frontend.slot.catalog.homePathwayCard.v1',
-+          id: 'customHomePathwayCard',
++          slotId: 'org.openedx.frontend.slot.catalog.courseCatalogDataTablePathwayCard.v1',
++          id: 'customDataTablePathwayCard',
 +          op: WidgetOperationTypes.REPLACE,
 +          relatedId: 'defaultContent',
 +          element: <div className="display-4">🛤️</div>,
@@ -63,7 +62,7 @@ Add the following to your site config to replace the Home page pathway card enti
 
 ```diff
 -import { catalogApp } from './src';
-+import { catalogApp, type HomePathwayCardSlotProps } from './src';
++import { catalogApp, type CourseCatalogDataTablePathwayCardSlotProps } from './src';
 
 +import { Badge, Card } from '@openedx/paragon';
 +
@@ -76,7 +75,7 @@ Add the following to your site config to replace the Home page pathway card enti
 +  org,
 +  courseCount,
 +  categoryLabel,
-+}: HomePathwayCardSlotProps) => {
++}: CourseCatalogDataTablePathwayCardSlotProps) => {
 +  if (isLoading) { return <Card isLoading />; }
 +  if (!pathwayId) { return null; }
 +
@@ -102,8 +101,8 @@ Add the following to your site config to replace the Home page pathway card enti
        ...catalogApp,
 +      slots: [
 +        {
-+          slotId: 'org.openedx.frontend.slot.catalog.homePathwayCard.v1',
-+          id: 'customHomePathwayCard',
++          slotId: 'org.openedx.frontend.slot.catalog.courseCatalogDataTablePathwayCard.v1',
++          id: 'customDataTablePathwayCard',
 +          op: WidgetOperationTypes.REPLACE,
 +          relatedId: 'defaultContent',
 +          component: customPathwayCard,
