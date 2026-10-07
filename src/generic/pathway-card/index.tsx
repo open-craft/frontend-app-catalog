@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 import {
   Badge, Card, breakpoints, useMediaQuery,
 } from '@openedx/paragon';
-import { getAppConfig, useIntl } from '@openedx/frontend-base';
+import { getAppConfig, resolveRouteByRole, useIntl } from '@openedx/frontend-base';
 
 import noCourseImg from '@src/assets/images/no-course-image.svg';
-import { appId } from '@src/constants';
+import { appId, pathwayDetailRole } from '@src/constants';
 import { isValidCssColor } from '@src/utils';
 
 import messages from './messages';
@@ -37,6 +37,9 @@ export const PathwayCard = ({
   const badgeLabel = categoryLabel || '';
   const badgeBackgroundColor = categoryBackgroundColor;
   const badgeTextColor = categoryTextColor;
+  const pathwayDetailUrl = pathwayId
+    ? resolveRouteByRole(pathwayDetailRole, { pathwayId })?.url
+    : undefined;
 
   const hasCustomColors = !!badgeBackgroundColor
     && !!badgeTextColor
@@ -45,8 +48,8 @@ export const PathwayCard = ({
 
   return (
     <Card
-      as={pathwayId ? Link : 'div'}
-      to={pathwayId ? `/pathways/${pathwayId}` : undefined}
+      as={pathwayDetailUrl ? Link : 'div'}
+      to={pathwayDetailUrl}
       // TODO: Temporary use of `d-flex` to fix alignment. Remove once the related Paragon issue
       // (https://github.com/openedx/paragon/issues/3792) is resolved.
       className={`pathway-card d-flex ${isExtraSmall ? 'w-100' : 'pathway-card-desktop'}`}

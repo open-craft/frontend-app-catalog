@@ -10,6 +10,10 @@ import messages from './messages';
 jest.mock('@openedx/frontend-base', () => ({
   ...jest.requireActual('@openedx/frontend-base'),
   getAppConfig: jest.fn(),
+  resolveRouteByRole: jest.fn((_role: string, { pathwayId }: { pathwayId: string }) => ({
+    url: `/catalog/pathways/${pathwayId}`,
+    isInternal: true,
+  })),
 }));
 
 const mockGetAppConfig = getAppConfig as jest.Mock;
@@ -89,7 +93,7 @@ describe('PathwayCard', () => {
     render(<PathwayCard {...props} courseCount={1} />);
 
     expect(screen.getByText('1 Course')).toBeInTheDocument();
-    expect(screen.getByRole('link')).toHaveAttribute('href', '/pathways/pathway-1');
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/catalog/pathways/pathway-1');
   });
 
   it('renders as a div without a pathway id', () => {
