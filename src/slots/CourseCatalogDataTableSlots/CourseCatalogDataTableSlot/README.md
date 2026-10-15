@@ -92,7 +92,7 @@ Add the following to your site config to replace the Course catalog data table e
 
 ![Custom data table with a stats panel above the CardView](./images/screenshot_custom_with_props.png)
 
-Add the following to your site config to replace the Course catalog data table with a custom component that displays a stats panel (totals, current page, aggregation counts) above a `CardView`-rendered course list. The diff below is against this app's `site.config.dev.tsx`.
+Add the following to your site config to replace the Course catalog data table with a custom component that displays a stats panel (totals, current page, aggregation counts) above a `CardView`-rendered list. Use the mixed-result dispatcher `CourseCatalogDataTableCardSlot` rather than a single card slot, so course and pathway results keep rendering through their own slots. The diff below is against this app's `site.config.dev.tsx`.
 
 ```diff
 -import { EnvironmentTypes, SiteConfig, ... } from '@openedx/frontend-base';
@@ -105,7 +105,7 @@ Add the following to your site config to replace the Course catalog data table w
 +import { DataTable, TextFilter, CardView, Alert, Stack, Chip, Badge } from '@openedx/paragon';
 +
 +import { DEFAULT_PAGE_SIZE } from '@src/data/course-list-search/constants';
-+import { CourseCatalogDataTableCourseCardSlot } from '@src/slots/CourseCatalogDataTableSlots';
++import { CourseCatalogDataTableCardSlot } from '@src/slots/CourseCatalogDataTableSlots';
 +
  import '@openedx/frontend-base/shell/style';
 
@@ -158,7 +158,7 @@ Add the following to your site config to replace the Course catalog data table w
 +        initialTableOptions={{ getRowId: (row) => row.id }}
 +      >
 +        <CardView
-+          CardComponent={CourseCatalogDataTableCourseCardSlot}
++          CardComponent={CourseCatalogDataTableCardSlot}
 +          skeletonCardCount={Math.min(displayData?.total ?? DEFAULT_PAGE_SIZE, DEFAULT_PAGE_SIZE)}
 +        />
 +      </DataTable>

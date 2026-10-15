@@ -1,9 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { getAppConfig, IntlProvider } from '@openedx/frontend-base';
 
 import type { CatalogListSearchMixedResult } from '@src/data/course-list-search/types';
+import * as CourseCatalogDataTableSlots from '@src/slots/CourseCatalogDataTableSlots';
 
+import CourseCatalogDataTablePathwayCardSlot from './CourseCatalogDataTablePathwayCardSlot';
 import { CourseCatalogDataTableCardSlot } from '.';
 
 jest.mock('@openedx/frontend-base', () => ({
@@ -48,15 +50,15 @@ const renderComponent = (props: React.ComponentProps<typeof CourseCatalogDataTab
   <IntlProvider locale="en"><MemoryRouter><CourseCatalogDataTableCardSlot {...props} /></MemoryRouter></IntlProvider>,
 );
 
+beforeEach(() => {
+  mockGetAppConfig.mockReturnValue({ ENABLE_PATHWAY_PILOT_UI: true });
+});
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
 describe('CourseCatalogDataTableCardSlot', () => {
-  beforeEach(() => {
-    mockGetAppConfig.mockReturnValue({ ENABLE_PATHWAY_PILOT_UI: true });
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders the pathway card slot for pathway results', () => {
     renderComponent({ original: pathway });
 
@@ -72,6 +74,28 @@ describe('CourseCatalogDataTableCardSlot', () => {
   it('renders the course card slot for loading rows without a result', () => {
     renderComponent({ isLoading: true });
 
+    expect(screen.getByTestId('course-card')).toBeInTheDocument();
+  });
+});
+
+describe('CourseCatalogDataTableSlots barrel', () => {
+  it('re-exports the mixed dispatcher and the pathway card slot, dispatching both result types', () => {
+    expect(CourseCatalogDataTableSlots.CourseCatalogDataTableCardSlot).toBe(CourseCatalogDataTableCardSlot);
+    expect(CourseCatalogDataTableSlots.CourseCatalogDataTablePathwayCardSlot).toBe(CourseCatalogDataTablePathwayCardSlot);
+
+    const renderViaBarrel = (original: CatalogListSearchMixedResult) => render(
+      <IntlProvider locale="en">
+        <MemoryRouter>
+          <CourseCatalogDataTableSlots.CourseCatalogDataTableCardSlot original={original} />
+        </MemoryRouter>
+      </IntlProvider>,
+    );
+
+    renderViaBarrel(pathway);
+    expect(screen.getByTestId('pathway-card')).toBeInTheDocument();
+
+    cleanup();
+    renderViaBarrel(course);
     expect(screen.getByTestId('course-card')).toBeInTheDocument();
   });
 });

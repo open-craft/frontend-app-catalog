@@ -14,6 +14,10 @@ Each result is dispatched to the card slot for its type: pathway results to
 [`courseCatalogDataTablePathwayCard`](./CourseCatalogDataTablePathwayCardSlot/)
 and everything else to
 [`courseCatalogDataTableCourseCard`](./CourseCatalogDataTableCourseCardSlot/).
+The dispatcher is exported as `CourseCatalogDataTableCardSlot` (with the
+pathway card slot as `CourseCatalogDataTablePathwayCardSlot` and the course
+card slot as `CourseCatalogDataTableCourseCardSlot`) from the
+[slot barrel](./..) for custom views that render mixed results.
 
 ## Examples
 
@@ -92,7 +96,7 @@ Add the following to your site config to replace the card view entirely (in this
 
 ![Custom 2-column grid layout reading displayData](./images/screenshot_custom_with_props.png)
 
-Add the following to your site config to replace the card view with a custom 2-column grid that maps over `displayData.results` and renders each course through the standard course card slot.
+Add the following to your site config to replace the card view with a custom 2-column grid that maps over `displayData.results` and renders each mixed result through the exported `CourseCatalogDataTableCardSlot` dispatcher, so courses and pathways keep using their own card slots.
 
 ```diff
 -import { EnvironmentTypes, SiteConfig, ... } from '@openedx/frontend-base';
@@ -101,7 +105,7 @@ Add the following to your site config to replace the card view with a custom 2-c
 -import { catalogApp } from './src';
 +import { catalogApp, type CourseCatalogDataTableCardViewSlotProps } from './src';
 
-+import CourseCatalogDataTableCourseCardSlot from '@src/slots/CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot/CourseCatalogDataTableCourseCardSlot';
++import { CourseCatalogDataTableCardSlot } from '@src/slots/CourseCatalogDataTableSlots';
 +
  import '@openedx/frontend-base/shell/style';
 
@@ -109,10 +113,10 @@ Add the following to your site config to replace the card view with a custom 2-c
 +  if (!displayData?.results) { return null; }
 +  return (
 +    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem' }}>
-+      {displayData.results.map((course) => (
-+        <CourseCatalogDataTableCourseCardSlot
-+          key={course.id}
-+          original={course}
++      {displayData.results.map((result) => (
++        <CourseCatalogDataTableCardSlot
++          key={result.id}
++          original={result}
 +          isLoading={false}
 +        />
 +      ))}
