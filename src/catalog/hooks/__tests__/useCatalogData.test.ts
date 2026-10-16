@@ -23,11 +23,35 @@ describe('useCatalogData', () => {
     expect(result.current.previousCatalogData).toEqual(mockCatalogData);
   });
 
-  it('should not save catalog data when searching', () => {
-    const { result } = renderHook(() => useCatalogData({
-      catalogData: mockCatalogData,
+  it('should not cache or save catalog data while searching', () => {
+    const { result, rerender } = renderHook(
+      ({ catalogData, searchString }: {
+        catalogData: typeof mockCatalogData | undefined; searchString: string;
+      }) => useCatalogData({ catalogData, searchString }),
+      {
+        initialProps: {
+          catalogData: mockCatalogData,
+          searchString: 'javascript',
+        },
+      },
+    );
+
+    // data present while searching is not saved
+    expect(result.current.previousCatalogData).toBeNull();
+
+    rerender({
+      catalogData: undefined,
       searchString: 'javascript',
-    }));
+    });
+
+    expect(result.current.previousCatalogData).toBeNull();
+
+    // data arriving mid-search is not cached either, so the previous data stays
+    // available for the empty-results fallback
+    rerender({
+      catalogData: { ...mockCatalogData, total: 999 },
+      searchString: 'javascript',
+    });
 
     expect(result.current.previousCatalogData).toBeNull();
   });
@@ -113,28 +137,5 @@ describe('useCatalogData', () => {
     });
 
     expect(result.current.previousCatalogData).toEqual(mockCatalogData);
-  });
-
-  it('should not save catalog data during search to keep previous data for empty results fallback', () => {
-    const { result, rerender } = renderHook(
-      ({ catalogData, searchString }: {
-        catalogData: typeof mockCatalogData | undefined; searchString: string;
-      }) => useCatalogData({ catalogData, searchString }),
-      {
-        initialProps: {
-          catalogData: undefined,
-          searchString: 'javascript',
-        },
-      },
-    );
-
-    expect(result.current.previousCatalogData).toBeNull();
-
-    rerender({
-      catalogData: mockCatalogData,
-      searchString: 'javascript',
-    });
-
-    expect(result.current.previousCatalogData).toBeNull();
   });
 });

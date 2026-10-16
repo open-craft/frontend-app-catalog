@@ -141,16 +141,50 @@ describe('<CoursesList />', () => {
     expect(within(infoAlert).getByText(messages.noCoursesAvailableMessage.defaultMessage)).toBeInTheDocument();
   });
 
-  it('displays courses when data is available', () => {
+  it('displays courses and pathway cards when data is available', () => {
+    const pathwayResult = {
+      id: 'pathway-1',
+      index: 'course_info',
+      type: 'pathway',
+      data: {
+        content: { displayName: 'Web Development' },
+        org: 'Open edX',
+        courseCount: 2,
+        imageUrl: '/pathway.jpg',
+        start: '2024-04-01T00:00:00Z',
+        categoryLabel: 'Bootcamp',
+        categoryBackgroundColor: '#654321',
+        categoryTextColor: '#eeeeee',
+      },
+    };
+
     mockUseCatalogListSearch.mockReturnValue({
       isLoading: false,
       isError: false,
-      data: mockCourseListSearchResponse,
+      data: {
+        ...mockCourseListSearchResponse,
+        results: [mockCourseListSearchResponse.results[0], pathwayResult],
+        total: 2,
+      },
+    });
+
+    mockedGetAppConfig.mockReturnValue({
+      ...actualGetAppConfig(appId),
+      ENABLE_PATHWAY_PILOT_UI: true,
     });
 
     render(<CoursesList />);
-    mockCourseListSearchResponse.results.forEach(course => {
-      expect(screen.getByText(course.data.content.displayName)).toBeInTheDocument();
+
+    const course = mockCourseListSearchResponse.results[0];
+    expect(screen.getByText(course.data.content.displayName)).toBeInTheDocument();
+
+    const pathwayCard = screen.getByTestId('pathway-card');
+    expect(within(pathwayCard).getByText('Web Development')).toBeInTheDocument();
+    expect(within(pathwayCard).getByText('Open edX')).toBeInTheDocument();
+    expect(within(pathwayCard).getByText('2 Courses')).toBeInTheDocument();
+    expect(within(pathwayCard).getByText('Bootcamp')).toHaveStyle({
+      backgroundColor: '#654321',
+      color: '#eeeeee',
     });
   });
 

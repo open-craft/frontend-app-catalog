@@ -28,10 +28,6 @@ const renderComponent = (props: React.ComponentProps<typeof HomePathwayCardSlot>
 );
 
 describe('HomePathwayCardSlot', () => {
-  beforeEach(() => {
-    mockGetAppConfig.mockReturnValue({ ENABLE_PATHWAY_PILOT_UI: true });
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -42,34 +38,5 @@ describe('HomePathwayCardSlot', () => {
     renderComponent({ original: pathway });
 
     expect(screen.queryByTestId('pathway-card')).not.toBeInTheDocument();
-  });
-
-  it('renders the mapped pathway card when the pathway pilot UI is enabled', () => {
-    renderComponent({ original: pathway });
-
-    expect(screen.getByTestId('pathway-card')).toBeInTheDocument();
-    expect(screen.getByText('Web Development')).toBeInTheDocument();
-    expect(screen.getByText('Open edX')).toBeInTheDocument();
-    expect(screen.getByText('2 Courses')).toBeInTheDocument();
-    expect(screen.getByText('Bootcamp')).toBeInTheDocument();
-  });
-
-  it('maps category fields', () => {
-    renderComponent({
-      original: {
-        ...pathway,
-        data: {
-          ...pathway.data,
-          category: 'bootcamp',
-          categoryBackgroundColor: '#654321',
-          categoryTextColor: '#eeeeee',
-        },
-      },
-    });
-
-    expect(screen.getByText('Bootcamp')).toHaveStyle({
-      backgroundColor: '#654321',
-      color: '#eeeeee',
-    });
   });
 });

@@ -41,28 +41,19 @@ describe('isValidCssColor', () => {
     expect(documentWasChecked).toBe(true);
   });
 
-  it('uses CSS.supports when available and accepts valid colors', () => {
-    const supports = jest.fn().mockReturnValue(true);
+  it.each([
+    { color: '#123456', supportsResult: true, expected: true },
+    { color: 'white', supportsResult: true, expected: true },
+    { color: 'not-a-color', supportsResult: false, expected: false },
+  ])('uses CSS.supports when available: $color -> $expected', ({ color, supportsResult, expected }) => {
+    const supports = jest.fn().mockReturnValue(supportsResult);
     Object.defineProperty(globalThis, 'CSS', {
       configurable: true,
       value: { supports },
     });
 
-    expect(isValidCssColor('#123456')).toBe(true);
-    expect(isValidCssColor('white')).toBe(true);
-    expect(supports).toHaveBeenCalledWith('color', '#123456');
-    expect(supports).toHaveBeenCalledWith('color', 'white');
-  });
-
-  it('uses CSS.supports when available and rejects invalid colors', () => {
-    const supports = jest.fn().mockReturnValue(false);
-    Object.defineProperty(globalThis, 'CSS', {
-      configurable: true,
-      value: { supports },
-    });
-
-    expect(isValidCssColor('not-a-color')).toBe(false);
-    expect(supports).toHaveBeenCalledWith('color', 'not-a-color');
+    expect(isValidCssColor(color)).toBe(expected);
+    expect(supports).toHaveBeenCalledWith('color', color);
   });
 
   it('falls back safely when CSS.supports throws', () => {

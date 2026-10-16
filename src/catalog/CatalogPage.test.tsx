@@ -20,18 +20,22 @@ jest.mock('../data/course-list-search/hooks', () => ({
   useCatalogListSearch: jest.fn(),
 }));
 
-jest.mock('@openedx/frontend-base', () => ({
-  ...jest.requireActual('@openedx/frontend-base'),
-  ErrorPage: ({ message }: { message: string }) => (
-    <div data-testid="error-page">{message}</div>
-  ),
-  getAppConfig: jest.fn(),
-  getAuthenticatedHttpClient: jest.fn(),
-  resolveRouteByRole: jest.fn((_role: string, { courseId }: { courseId: string }) => ({
-    url: `/courses/${courseId}/about`,
-    isInternal: true,
-  })),
-}));
+jest.mock('@openedx/frontend-base', () => {
+  const { pathwayDetailRole } = jest.requireActual('@src/constants');
+
+  return {
+    ...jest.requireActual('@openedx/frontend-base'),
+    ErrorPage: ({ message }: { message: string }) => (
+      <div data-testid="error-page">{message}</div>
+    ),
+    getAppConfig: jest.fn(),
+    getAuthenticatedHttpClient: jest.fn(),
+    resolveRouteByRole: jest.fn((role: string, { courseId, pathwayId }: { courseId?: string; pathwayId?: string }) => ({
+      url: role === pathwayDetailRole ? `/catalog/pathways/${pathwayId}` : `/courses/${courseId}/about`,
+      isInternal: true,
+    })),
+  };
+});
 
 const mockUseCatalogListSearch = useCatalogListSearch as jest.Mock;
 const mockedGetAppConfig = getAppConfig as jest.Mock;
@@ -40,16 +44,6 @@ const mockGetAuthenticatedHttpClient = getAuthenticatedHttpClient as jest.Mock;
 const { getAppConfig: actualGetAppConfig } = jest.requireActual('@openedx/frontend-base');
 const actualUseCatalogListSearch = jest
   .requireActual('../data/course-list-search/hooks').useCatalogListSearch;
-
-/**
- * The search response can mix courses and pathways; narrow to the course arm
- * before reading course-only fields off `data`.
- */
-const isCourseResult = (
-  result: CatalogListSearchMixedResult,
-): result is CatalogListSearchMixedResult & { type: 'course' | '_doc' } => result.type !== 'pathway';
-
-const courseResults = () => mockCourseListSearchResponse.results.filter(isCourseResult);
 
 const render = (ui: React.ReactElement) => {
   const queryClient = new QueryClient({
@@ -622,11 +616,50 @@ describe('CatalogPage', () => {
     });
   });
 
-  it('should render course cards with correct content', () => {
+  it('should render course and pathway cards with correct content and destinations', () => {
+    const courseResult: CatalogListSearchMixedResult = {
+      id: 'course-v1:OpenEdx+123+2023',
+      index: 'course_info',
+      type: '_doc',
+      title: 'Test course 1',
+      data: {
+        id: 'course-v1:OpenEdx+123+2023',
+        course: 'course-v1:OpenEdx+123+2023',
+        content: {
+          displayName: 'Test course 1',
+          number: '123',
+        },
+        imageUrl: '/course.jpg',
+        start: '2030-01-01T00:00:00',
+        number: '123',
+        org: 'OpenEdx',
+        modes: ['audit'],
+        language: 'en',
+        catalogVisibility: 'both',
+      },
+    };
+    const pathwayResult: CatalogListSearchMixedResult = {
+      id: 'pathway-1',
+      index: 'course_info',
+      type: 'pathway',
+      data: {
+        content: { displayName: 'Web Development Pathway' },
+        org: 'OpenEdx',
+        courseCount: 4,
+        imageUrl: '/pathway.jpg',
+        start: '2024-04-01T00:00:00Z',
+        categoryLabel: 'Bootcamp',
+      },
+    };
+
     mockUseCatalogListSearch.mockReturnValue({
       isLoading: false,
       isError: false,
-      data: mockCourseListSearchResponse,
+      data: {
+        ...mockCourseListSearchResponse,
+        results: [courseResult, pathwayResult],
+        total: 2,
+      },
       fetchData: jest.fn(),
       isFetching: false,
     });
@@ -634,17 +667,17 @@ describe('CatalogPage', () => {
     render(<CatalogPage />);
     expect(screen.getByText(messages.explore.defaultMessage)).toBeInTheDocument();
 
-    const courseCards = screen.getAllByTestId('course-card');
-    expect(courseCards.length).toBe(courseResults().length);
+    const courseCard = screen.getByTestId('course-card');
+    expect(within(courseCard).getByText('Test course 1')).toBeInTheDocument();
+    expect(within(courseCard).getByText('123')).toBeInTheDocument();
+    expect(within(courseCard).getByText('OpenEdx')).toBeInTheDocument();
+    expect(courseCard).toHaveAttribute('href', '/courses/course-v1:OpenEdx+123+2023/about');
 
-    courseResults().forEach((course, index) => {
-      const courseCard = courseCards[index];
-
-      expect(within(courseCard).getByText(course.data.content.displayName)).toBeInTheDocument();
-      expect(within(courseCard).getByText(course.data.content.number ?? '')).toBeInTheDocument();
-      expect(within(courseCard).getByText(course.data.org)).toBeInTheDocument();
-      expect(courseCard).toHaveAttribute('href', `/courses/${course.data.course}/about`);
-    });
+    const pathwayCard = screen.getByTestId('pathway-card');
+    expect(within(pathwayCard).getByText('Web Development Pathway')).toBeInTheDocument();
+    expect(within(pathwayCard).getByText('OpenEdx')).toBeInTheDocument();
+    expect(within(pathwayCard).getByText('4 Courses')).toBeInTheDocument();
+    expect(pathwayCard).toHaveAttribute('href', '/catalog/pathways/pathway-1');
   });
 
   it('should call fetchData with correct parameters when applying language filter', async () => {
