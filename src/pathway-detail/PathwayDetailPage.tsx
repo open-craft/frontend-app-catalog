@@ -13,15 +13,15 @@ import messages from './messages';
 import { usePathwayNavigation } from './hooks/usePathwayNavigation';
 
 /**
- * Responsive Bootstrap grid config for the two page columns, mirroring
- * CourseAboutPage's Layout usage: stacked on mobile, 9/3 split at lg and up.
+ * Responsive Bootstrap grid config for the two page columns: stacked on mobile,
+ * 8/1/3 at lg and up, where the sidebar's one-column offset is the gap.
  */
 const PAGE_LAYOUT = {
   xs: [{ span: 12 }, { span: 12 }],
   sm: [{ span: 12 }, { span: 12 }],
   md: [{ span: 12 }, { span: 12 }],
-  lg: [{ span: 9 }, { span: 3 }],
-  xl: [{ span: 9 }, { span: 3 }],
+  lg: [{ span: 8 }, { span: 3, offset: 1 }],
+  xl: [{ span: 8 }, { span: 3, offset: 1 }],
 };
 
 const PathwayDetailPage = () => {

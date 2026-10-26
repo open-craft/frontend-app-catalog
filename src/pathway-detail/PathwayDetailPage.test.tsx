@@ -249,6 +249,14 @@ describe('PathwayDetailPage', () => {
 
     const factsAside = screen.getByRole('complementary', { name: messages.factsAriaLabel.defaultMessage });
     expect(within(factsAside).getByRole('group', { name: messages.shareHeading.defaultMessage })).toBeInTheDocument();
+
+    // Both columns stack full width, then split 8/1/3 from lg: the sidebar's
+    // offset is the gap that keeps it flush right.
+    const sidebarColumn = factsAside.parentElement as HTMLElement;
+    const mainColumn = sidebarColumn.parentElement?.firstElementChild as HTMLElement;
+    expect(mainColumn).toHaveClass('col-12', 'col-lg-8');
+    expect(mainColumn).not.toHaveClass('offset-lg-1');
+    expect(sidebarColumn).toHaveClass('col-12', 'col-lg-3', 'offset-lg-1');
     // Only badges use a Paragon icon; certificate cards carry the custom image.
     expect(document.querySelectorAll('.pathway-detail-credential-card .pgn__icon')).toHaveLength(
       DATA_ENGINEERING_PATHWAY.credentials
