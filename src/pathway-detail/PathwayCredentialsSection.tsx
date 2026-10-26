@@ -28,7 +28,7 @@ export const PathwayCredentialsSection = ({ pathway }: PathwayCredentialsSection
         {pathway.certificateLabel && (
           <Card className="pathway-detail-featured-credential d-flex rounded bg-primary-100">
             <Card.Body className="d-flex flex-column align-items-center justify-content-center text-center p-4">
-              <CertificateIcon aria-hidden className="mb-3" />
+              <CertificateIcon aria-hidden className="mb-3 mt-2" />
               <strong className="mb-1">{pathway.name}</strong>
               <span className="small">{pathway.certificateLabel}</span>
             </Card.Body>
