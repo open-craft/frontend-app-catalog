@@ -16,12 +16,21 @@ import ActualHomePage from './HomePage';
 import homePageMessages from './messages';
 import messages from './components/home-banner/messages';
 
+// Duplicated as a mock-prefixed literal because jest.mock factories cannot
+// reference imported values.
+const mockPathwayDetailRole = 'org.openedx.frontend.role.pathwayDetail';
+
 jest.mock('@openedx/frontend-base', () => ({
   ...jest.requireActual('@openedx/frontend-base'),
   getAppConfig: jest.fn(),
   getUrlByRouteRole: jest.fn(() => '/courses/:courseId/about'),
-  resolveRouteByRole: jest.fn((_role: string, { courseId }: { courseId: string }) => ({
-    url: `/courses/${courseId}/about`,
+  // Role-aware: the list mixes courses and pathways, and each card resolves its
+  // own detail route (course About vs pathway detail).
+  resolveRouteByRole: jest.fn((
+    role: string,
+    { courseId, pathwayId }: { courseId?: string; pathwayId?: string },
+  ) => ({
+    url: role === mockPathwayDetailRole ? `/pathways/${pathwayId}` : `/courses/${courseId}/about`,
     isInternal: true,
   })),
 }));
