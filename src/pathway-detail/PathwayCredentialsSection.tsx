@@ -7,8 +7,7 @@ import {
 } from '@openedx/paragon/icons';
 import { useIntl } from '@openedx/frontend-base';
 
-import certificateIcon from '@src/assets/images/pathway-certificate.svg';
-
+import { CertificateIcon } from './icons';
 import { INITIAL_VISIBLE_COUNT } from './sections';
 import messages from './messages';
 import type { PathwayDetailData } from './types';
@@ -29,7 +28,7 @@ export const PathwayCredentialsSection = ({ pathway }: PathwayCredentialsSection
         {pathway.certificateLabel && (
           <Card className="pathway-detail-featured-credential d-flex rounded bg-primary-100">
             <Card.Body className="d-flex flex-column align-items-center justify-content-center text-center p-4">
-              <img src={certificateIcon} alt="" className="mb-3" />
+              <CertificateIcon aria-hidden className="mb-3" />
               <strong className="mb-1">{pathway.name}</strong>
               <span className="small">{pathway.certificateLabel}</span>
             </Card.Body>
@@ -47,7 +46,7 @@ export const PathwayCredentialsSection = ({ pathway }: PathwayCredentialsSection
               <Card.Body className="d-flex flex-column align-items-center text-center p-4">
                 {isBadge
                   ? <Icon src={WorkspacePremium} size="lg" className="text-info-800 mb-3" />
-                  : <img src={certificateIcon} alt="" className="mb-3" />}
+                  : <CertificateIcon aria-hidden className="mb-3" />}
                 <strong>
                   {intl.formatMessage(
                     isBadge ? messages.earnBadgeTitle : messages.earnCertificateTitle,

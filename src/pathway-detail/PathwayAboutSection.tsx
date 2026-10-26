@@ -13,9 +13,9 @@ import {
 } from '@openedx/paragon/icons';
 import { useIntl } from '@openedx/frontend-base';
 
-import courseContentIcon from '@src/assets/images/pathway-course-content.svg';
 import type { IntlShape } from '@src/utils';
 
+import { CourseContentIcon } from './icons';
 import { PathwayCourseModal } from './PathwayCourseModal';
 import { INITIAL_VISIBLE_COUNT } from './sections';
 import messages from './messages';
@@ -35,9 +35,7 @@ const renderCourseTitle = (course: PathwayCourse, intl: IntlShape) => {
         </span>
         <span className="d-inline-flex align-items-center">{course.pace}</span>
         <span className="d-inline-flex align-items-center">
-          {isBadge
-            ? <Icon src={WorkspacePremium} size="sm" className="text-info-800" />
-            : <img src={courseContentIcon} alt="" />}
+          <Icon src={isBadge ? WorkspacePremium : CourseContentIcon} size="sm" className="text-info-800" />
           {intl.formatMessage(isBadge ? messages.badgeCount : messages.certificateCount, { count })}
         </span>
       </span>

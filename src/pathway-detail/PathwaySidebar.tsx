@@ -2,7 +2,6 @@ import type { ComponentType } from 'react';
 import { Card, Icon, Stack } from '@openedx/paragon';
 import {
   AccessTimeFilled as AccessTimeFilledIcon,
-  CardMembership as CardMembershipIcon,
   Event as EventIcon,
   FormatListBulleted as FormatListBulletedIcon,
   MenuBook as MenuBookIcon,
@@ -13,6 +12,7 @@ import { useIntl } from '@openedx/frontend-base';
 
 import { getShareLinks, ShareLinks, type ShareCopy } from '@src/generic/share-links';
 
+import { CourseContentIcon } from './icons';
 import messages from './messages';
 import type { PathwayDetailData, PathwayFact } from './types';
 
@@ -23,7 +23,7 @@ const FACT_ICONS: Record<PathwayFact['kind'], ComponentType> = {
   price: MonetizationOnIcon,
   duration: AccessTimeFilledIcon,
   pace: MenuBookIcon,
-  certificates: CardMembershipIcon,
+  certificates: CourseContentIcon,
   badges: WorkspacePremiumIcon,
 };
 
