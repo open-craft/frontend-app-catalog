@@ -22,6 +22,8 @@ import {
 } from '@openedx/paragon/icons';
 import { mockCourseAboutResponse } from '@src/__mocks__';
 import noCourseImg from '@src/assets/images/no-course-image.svg';
+import certificateIcon from '@src/assets/images/pathway-certificate.svg';
+import courseContentIcon from '@src/assets/images/pathway-course-content.svg';
 import { appId, courseAboutRole } from '@src/constants';
 import { fetchCourseAboutData } from '@src/course-about/data/api';
 import sidebarDetailsMessages from '@src/course-about/course-sidebar/sidebar-details/messages';
@@ -238,8 +240,11 @@ describe('PathwayDetailPage', () => {
 
     const factsAside = screen.getByRole('complementary', { name: messages.factsAriaLabel.defaultMessage });
     expect(within(factsAside).getByRole('group', { name: messages.shareHeading.defaultMessage })).toBeInTheDocument();
+    // Only badges use a Paragon icon; certificate cards carry the custom image.
     expect(document.querySelectorAll('.pathway-detail-credential-card .pgn__icon')).toHaveLength(
-      INITIAL_VISIBLE_COUNT,
+      DATA_ENGINEERING_PATHWAY.credentials
+        .slice(0, INITIAL_VISIBLE_COUNT)
+        .filter((credential) => credential.kind === 'badge').length,
     );
 
     const sectionNav = screen.getByRole('navigation', { name: messages.sectionsNavLabel.defaultMessage });
@@ -538,6 +543,15 @@ describe('PathwayDetailPage', () => {
     const metadataIcons = aboutSection.querySelectorAll('.pathway-detail-course-meta .pgn__icon');
     expect(metadataIcons.length).toBeGreaterThan(0);
     metadataIcons.forEach((icon) => expect(icon).toHaveClass('text-info-800'));
+
+    // The credential icon follows the kind: a custom image for a certificate, a
+    // Paragon icon for a badge.
+    const credentialMeta = (row: HTMLElement) => row.querySelectorAll('.pathway-detail-course-meta > span')[2];
+    expect(credentialMeta(rowFor(certificateCourse.title)).querySelector('img')).toHaveAttribute(
+      'src',
+      courseContentIcon,
+    );
+    expect(iconPath(credentialMeta(rowFor(badgeCourse.title)))).toBe(iconPathOf(WorkspacePremium));
   });
 
   it('drives credential card copy, icon and styling from the credential kind', () => {
@@ -559,23 +573,26 @@ describe('PathwayDetailPage', () => {
       if (isBadge) {
         expect(card).toHaveClass('bg-primary-100');
         expect(card).not.toHaveClass('bg-light-100');
+        expect(card.querySelector('.pgn__icon svg')).toBeInTheDocument();
       } else {
         expect(card).toHaveClass('bg-light-100');
+        expect(card.querySelector('.pgn__icon')).not.toBeInTheDocument();
+        expect(card.querySelector('img')).toHaveAttribute('src', certificateIcon);
       }
-      expect(card.querySelector('.pgn__icon svg')).toBeInTheDocument();
       expect(within(card).getByText(expectedTitle)).toBeInTheDocument();
       expect(within(card).getByText(credentialCourseTitle(credential.courseTitle))).toBeInTheDocument();
     });
 
-    // The card's class comes from the kind, so comparing its icon against the
-    // named icon fails if the badge and certificate icons are ever swapped.
+    // The card's class comes from the kind, so one representative card per kind
+    // shows which icon it renders: the named Paragon icon for a badge, the custom
+    // image and no Paragon icon for a certificate.
     const badgeCard = credentialsSection.querySelector('.pathway-detail-credential-card-badge') as Element;
     const certificateCard = credentialsSection.querySelector(
       '.pathway-detail-credential-card-certificate',
     ) as Element;
     expect(iconPath(badgeCard)).toBe(iconPathOf(WorkspacePremium));
-    expect(iconPath(certificateCard)).toBe(iconPathOf(CardMembershipIcon));
-    expect(iconPath(badgeCard)).not.toBe(iconPath(certificateCard));
+    expect(certificateCard.querySelector('.pgn__icon')).not.toBeInTheDocument();
+    expect(certificateCard.querySelector('img')).toHaveAttribute('src', certificateIcon);
   });
 
   it('renders the featured pathway certificate first and outside the ordinary credential cards', () => {
@@ -594,7 +611,9 @@ describe('PathwayDetailPage', () => {
     expect(credentialsSection.querySelectorAll('.pathway-detail-featured-credential')).toHaveLength(1);
     expect(within(featured).getByText(name)).toBeInTheDocument();
     expect(within(featured).getByText(featuredCertificateLabel)).toBeInTheDocument();
-    expect(iconPath(featured)).toBe(iconPathOf(CardMembershipIcon));
+    // The section's certificate graphic is the custom asset, not a Paragon icon.
+    expect(featured.querySelector('.pgn__icon')).not.toBeInTheDocument();
+    expect(featured.querySelector('img')).toHaveAttribute('src', certificateIcon);
     // Ordinary credential counts and See more ignore the featured card.
     expect(featured).not.toHaveClass('pathway-detail-credential-card');
   });
