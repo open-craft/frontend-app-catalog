@@ -23,3 +23,4 @@ export type { CourseCatalogDataTableSlotProps } from './slots/CourseCatalogDataT
 export type { CourseCatalogDataTableControlBarSlotProps } from './slots/CourseCatalogDataTableSlots/CourseCatalogDataTableControlBarSlot';
 export type { CourseCatalogDataTableCardViewSlotProps } from './slots/CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot';
 export type { CourseCatalogDataTableCourseCardSlotProps } from './slots/CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot/CourseCatalogDataTableCourseCardSlot';
+export type { CourseCatalogDataTablePathwayCardSlotProps } from './slots/CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot/CourseCatalogDataTablePathwayCardSlot';

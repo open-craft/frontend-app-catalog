@@ -112,6 +112,15 @@ export const mockCatalogSearchResponse: CatalogSearchResponse = {
     },
   ],
   aggs: {
+    category: {
+      terms: {
+        course: 3,
+        bootcamp: 1,
+        tutorial: 1,
+      },
+      total: 5,
+      other: 0,
+    },
     language: {
       terms: {
         en: 5,
