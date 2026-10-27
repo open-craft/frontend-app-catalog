@@ -7,6 +7,7 @@ course and pathway cards, table footer).
 - `CatalogDataTableControlBarSlot`
 - `CatalogDataTableCardViewSlot` (id `catalogDataTableCardView.v1`, deprecated `courseCatalogDataTableCardView.v1` below it)
 - `CatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot`
+- `CatalogDataTableCardViewSlot/CatalogDataTablePathwayCardSlot`
 - `CatalogDataTableTableFooterSlot`
 
 For the full list of app slots, see [`../README.md`](../).

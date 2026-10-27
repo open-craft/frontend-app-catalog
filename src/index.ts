@@ -35,6 +35,7 @@ export type {
 export type {
   CatalogDataTableCourseCardSlotProps, CourseCatalogDataTableCourseCardSlotProps,
 } from './slots/CourseCatalogDataTableSlots/CatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot';
+export type { CatalogDataTablePathwayCardSlotProps } from './slots/CourseCatalogDataTableSlots/CatalogDataTableCardViewSlot/CatalogDataTablePathwayCardSlot';
 
 export type {
   CatalogSearchParams,

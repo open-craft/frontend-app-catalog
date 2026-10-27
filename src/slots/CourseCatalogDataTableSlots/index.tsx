@@ -3,6 +3,7 @@ import CatalogDataTableControlBarSlot from './CatalogDataTableControlBarSlot';
 import CatalogDataTableCardViewSlot from './CatalogDataTableCardViewSlot';
 import CatalogDataTableTableFooterSlot from './CatalogDataTableTableFooterSlot';
 import CatalogDataTableCourseCardSlot from './CatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot';
+import CatalogDataTablePathwayCardSlot from './CatalogDataTableCardViewSlot/CatalogDataTablePathwayCardSlot';
 
 export {
   CatalogDataTableSlot,
@@ -10,4 +11,5 @@ export {
   CatalogDataTableCardViewSlot,
   CatalogDataTableTableFooterSlot,
   CatalogDataTableCourseCardSlot,
+  CatalogDataTablePathwayCardSlot,
 };
