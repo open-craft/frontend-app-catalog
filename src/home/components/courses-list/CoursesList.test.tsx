@@ -137,8 +137,8 @@ describe('<CoursesList />', () => {
 
     render(<CoursesList />);
     const infoAlert = screen.getByRole('alert');
-    expect(within(infoAlert).getByText(messages.noCoursesAvailable.defaultMessage)).toBeInTheDocument();
-    expect(within(infoAlert).getByText(messages.noCoursesAvailableMessage.defaultMessage)).toBeInTheDocument();
+    expect(within(infoAlert).getByText(messages.noItemsAvailable.defaultMessage)).toBeInTheDocument();
+    expect(within(infoAlert).getByText(messages.noItemsAvailableMessage.defaultMessage)).toBeInTheDocument();
   });
 
   it('displays courses when data is available', () => {

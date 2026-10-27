@@ -20,10 +20,11 @@ jest.mock('@openedx/frontend-base', () => ({
   ...jest.requireActual('@openedx/frontend-base'),
   getAppConfig: jest.fn(),
   getUrlByRouteRole: jest.fn(() => '/courses/:courseId/about'),
-  resolveRouteByRole: jest.fn((_role: string, { courseId }: { courseId: string }) => ({
-    url: `/courses/${courseId}/about`,
-    isInternal: true,
-  })),
+  resolveRouteByRole: jest.fn((role: string, params: { courseId?: string; pathwayId?: string }) => (
+    role === 'org.openedx.frontend.role.pathwayDetail'
+      ? { url: `/catalog/pathways/${params.pathwayId}`, isInternal: true }
+      : { url: `/courses/${params.courseId}/about`, isInternal: true }
+  )),
 }));
 
 jest.mock('@src/data/catalog-search/hooks', () => ({
@@ -171,7 +172,7 @@ describe('HomePage', () => {
       cards.forEach((card, index) => {
         const item = mockCatalogSearchResponse.results[index];
         if (item.type === 'pathway') {
-          expect(card).toHaveAttribute('href', `/pathways/${item.id}`);
+          expect(card).toHaveAttribute('href', `/catalog/pathways/${item.id}`);
         } else {
           expect(card).toHaveAttribute('href', `/courses/${item.id}/about`);
         }

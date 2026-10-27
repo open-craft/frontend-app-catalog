@@ -30,7 +30,7 @@ const CoursesList = () => {
   const maxCourses = getCountConfig('HOMEPAGE_COURSE_MAX', DEFAULT_COURSES_COUNT);
 
   const {
-    data: courseData,
+    data: catalogData,
     isLoading: isCoursesLoading,
     isError: isCoursesError,
   } = useCatalogSearch({
@@ -85,17 +85,17 @@ const CoursesList = () => {
       size="xl"
       data-testid="courses-list"
     >
-      {!courseData?.results?.length ? (
+      {!catalogData?.results?.length ? (
         <AlertNotification
           className="my-0"
           variant="info"
-          title={intl.formatMessage(messages.noCoursesAvailable)}
-          message={intl.formatMessage(messages.noCoursesAvailableMessage)}
+          title={intl.formatMessage(messages.noItemsAvailable)}
+          message={intl.formatMessage(messages.noItemsAvailableMessage)}
         />
       ) : (
         <Container className="text-center">
           <CardGrid columnSizes={CARD_GRID_LAYOUT}>
-            {courseData?.results?.map((result: CatalogSearchResult) => (
+            {catalogData?.results?.map((result: CatalogSearchResult) => (
               result.type === 'pathway' ? (
                 <HomePathwayCardSlot key={result.id} original={result} />
               ) : (
@@ -103,7 +103,7 @@ const CoursesList = () => {
               )
             ))}
           </CardGrid>
-          {courseData?.total > maxCourses && (
+          {catalogData?.total > maxCourses && (
             <Button
               className="mt-3"
               variant="brand"
