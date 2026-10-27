@@ -55,7 +55,7 @@ export interface DataTableParams {
   searchString?: string;
 }
 
-export interface CourseListSearchHook {
+export interface CatalogListSearchHook {
   data: CourseListSearchResponse | undefined;
   isLoading: boolean;
   isFetching: boolean;

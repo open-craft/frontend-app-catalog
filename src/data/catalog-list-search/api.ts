@@ -22,7 +22,7 @@ const toPaginationValue = (value: unknown, fallback: number, minimum: number): n
  * Fetches course list search data from the API.
  * @async
  */
-export const fetchCourseListSearch = async (params): Promise<CourseListSearchResponse> => {
+export const fetchCatalogListSearch = async (params): Promise<CourseListSearchResponse> => {
   const {
     enableCourseSortingByStartDate = false,
     filters = {},

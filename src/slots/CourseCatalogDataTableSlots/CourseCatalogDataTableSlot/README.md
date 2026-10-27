@@ -104,7 +104,7 @@ Add the following to your site config to replace the Course catalog data table w
 +import { useState } from 'react';
 +import { DataTable, TextFilter, CardView, Alert, Stack, Chip, Badge } from '@openedx/paragon';
 +
-+import { DEFAULT_PAGE_SIZE } from '@src/data/course-list-search/constants';
++import { DEFAULT_PAGE_SIZE } from '@src/data/catalog-list-search/constants';
 +import { CourseCatalogDataTableCourseCardSlot } from '@src/slots/CourseCatalogDataTableSlots';
 +
  import '@openedx/frontend-base/shell/style';
