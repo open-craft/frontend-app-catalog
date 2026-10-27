@@ -10,18 +10,14 @@ import { useCatalogSearch } from '@src/data/catalog-search/hooks';
 import { AlertNotification } from '@src/generic';
 import { DEFAULT_PAGE_INDEX } from '@src/data/catalog-search/constants';
 import HomeCourseCardSlot from '@src/slots/HomeCourseCardSlot';
+import HomePathwayCardSlot from '@src/slots/HomePathwayCardSlot';
 import { LoaderSlot } from '@src/slots/LoaderSlot';
-import { appId, coursesRole } from '@src/constants';
 import type { CatalogSearchResult } from '@src/data/catalog-search/types';
+import { appId, coursesRole } from '@src/constants';
 import { getCountConfig, getStringConfig } from '@src/config';
 import { DEFAULT_COURSES_COUNT } from '@src/home/constants';
 
 import messages from './messages';
-
-type CourseResult = Extract<CatalogSearchResult, { type: 'course' | '_doc' }>;
-
-/** The home list renders course cards only until pathway cards land. */
-const isCourseResult = (result: CatalogSearchResult): result is CourseResult => result.type !== 'pathway';
 
 const CARD_GRID_LAYOUT = {
   xs: 12, md: 6, lg: 4, xl: 3,
@@ -34,7 +30,7 @@ const CoursesList = () => {
   const maxCourses = getCountConfig('HOMEPAGE_COURSE_MAX', DEFAULT_COURSES_COUNT);
 
   const {
-    data: catalogData,
+    data: courseData,
     isLoading: isCoursesLoading,
     isError: isCoursesError,
   } = useCatalogSearch({
@@ -89,7 +85,7 @@ const CoursesList = () => {
       size="xl"
       data-testid="courses-list"
     >
-      {!catalogData?.results?.length ? (
+      {!courseData?.results?.length ? (
         <AlertNotification
           className="my-0"
           variant="info"
@@ -99,11 +95,15 @@ const CoursesList = () => {
       ) : (
         <Container className="text-center">
           <CardGrid columnSizes={CARD_GRID_LAYOUT}>
-            {catalogData?.results?.filter(isCourseResult).map(course => (
-              <HomeCourseCardSlot key={course.id} original={course} />
+            {courseData?.results?.map((result: CatalogSearchResult) => (
+              result.type === 'pathway' ? (
+                <HomePathwayCardSlot key={result.id} original={result} />
+              ) : (
+                <HomeCourseCardSlot key={result.id} original={result} />
+              )
             ))}
           </CardGrid>
-          {catalogData?.total > maxCourses && (
+          {courseData?.total > maxCourses && (
             <Button
               className="mt-3"
               variant="brand"
