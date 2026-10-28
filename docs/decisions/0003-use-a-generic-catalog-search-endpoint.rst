@@ -14,30 +14,35 @@ product requires pathways alongside courses in the same catalog experience:
 one shared ranking, one pagination, and shared filter facets, including a new
 "Categories" facet covering both courses and pathway types.
 
-Changing the existing edx-search endpoint
-``/search/unstable/v0/course_list_search/`` in place would risk breaking its
-current API contract: existing consumers may assume every result is a course,
-and mixed results, new ``type`` values, or course-only fields becoming
-optional could break them.
+The existing endpoint, ``/search/unstable/v0/course_list_search/``, is
+explicitly unstable and its only consumer is ``frontend-app-catalog``.
+Maintaining a second API contract and a second index would duplicate course
+documents and indexing paths for no external consumer, so this ADR replaces
+the endpoint instead of preserving it.
 
 Decision
 ********
 
-Keep ``/search/unstable/v0/course_list_search/`` exactly as it is. Its
-existing consumer contract and the shared legacy internals it relies on stay
-unchanged.
-
-Add a new endpoint, POST ``/search/unstable/v0/catalog_list_search/``,
-backed by one new mixed logical index, ``catalog_info``. The index name is
-configurable via ``CATALOG_INFO_INDEX_NAME``; index metadata is never exposed
-in responses. The existing ``course_info`` index remains. During the
-coexistence period, courses are duplicated into ``catalog_info``.
+Replace ``/search/unstable/v0/course_list_search/`` with POST
+``/search/v1/catalog_search/``, backed by one mixed logical index,
+``catalog_info``. Index metadata is never exposed in responses. The legacy
+endpoint is removed in the same release; there is no compatibility alias, and
+courses are not duplicated into a second index to keep the legacy endpoint
+alive.
 
 Ownership:
 
-* edx-platform owns course documents and normally pathway documents.
-* An installed backend extension may own pathway documents instead.
+* edx-platform owns course and pathway documents.
 * edx-search owns query and index configuration.
+
+The catalog MFE is the only consumer. It moves to the new endpoint and the new
+response shape in the same release as the backend change. Because the legacy
+endpoint is ``unstable/v0``, this ADR does not promise a deprecation period or
+a compatibility shim; an older catalog MFE version is not expected to work
+against the new backend.
+
+The existing ``course_info`` index and ``course_discovery_search`` semantics
+are out of scope and unchanged.
 
 Operational rollout/backfill of the new index is out of scope for this ADR.
 
@@ -168,9 +173,11 @@ and similar are sibling categories. Category labels come from the registry
 Frontend cutover
 ----------------
 
-* Switch the request URL, remove the sort flag and the ``_doc``
-  compatibility arm after cutover, and support the new app result shape,
-  labels, and category field names.
+* Switch the request URL to ``/search/v1/catalog_search/`` in the same release
+  as the backend change, remove the sort flag and the ``_doc`` compatibility
+  arm, and support the new app result shape, labels, and category field names.
+* No compatibility alias is provided: a catalog MFE version that predates the
+  switch is incompatible with the new backend.
 
 Unresolved backend assumptions (keep ADR Proposed)
 **************************************************
@@ -192,15 +199,17 @@ safely appear in search results.
 Alternatives considered
 ***********************
 
-* **Mutate the legacy endpoint.** Rejected: breaks the existing consumer
-  contract.
+* **Keep the legacy endpoint and add a second one.** Rejected: it duplicates
+  course documents and indexing paths for a single consumer, and the legacy
+  endpoint is explicitly unstable.
 * **Separate endpoints plus client-side merge.** Rejected: a correct single
   ranking, total, and pagination cannot be merged client-side.
 * **Separate indexes behind a backend aggregator.** Rejected: the edx-search
   search abstraction is single-index, and cross-engine score/aggregation
   merging is complex.
-* **One mixed index (chosen).** Correct mixed ranking, pagination, and
-  facets; legacy untouched.
+* **Replace the legacy endpoint with one mixed endpoint and one mixed index
+  (chosen).** Correct mixed ranking, pagination, and facets with no duplicate
+  documents or contracts.
 
 Consequences
 ************
@@ -208,14 +217,18 @@ Consequences
 Positive:
 
 * Correct single ranking, total, pagination, and facets.
-* Legacy endpoint and its consumers stay untouched.
+* One API contract for the catalog; no second catalog index kept only for the
+  legacy endpoint.
 * The existing single-index search abstraction can query the mixed index.
 
 Negative:
 
-* Courses are duplicated across indexes: extra storage and divergence risk.
-* If a backend extension owns pathway documents, the shared index has
-  independent producers.
+* The legacy endpoint is removed, so pinned or older catalog MFE versions stop
+  working against the new backend; the catalog MFE must ship in the same
+  release.
+* Courses are indexed in both ``catalog_info`` and ``course_info`` while course
+  discovery keeps using ``course_info``; consolidating the two indexes is out
+  of scope.
 * Every engine needs mixed-index schema/config support; adapters missing
   deterministic sorting must add it.
 * A new view/query path must convert engine-shaped hits into the application
@@ -232,15 +245,16 @@ Same contract matrix across all supported engines:
 * Category validation and registry enrichment.
 * Facet Boolean behavior and counts.
 * Application result shape.
-* Legacy endpoint unchanged.
+* The legacy URL is removed (404) and no compatibility alias remains.
 * Validation failures return 400.
 * Access leakage behavior, once defined.
 
 References
 **********
 
-* edx-search: ``search/urls.py`` (``course_list_search``),
-  ``search/views.py`` (``course_list_search`` → ``_course_discovery``),
+* edx-search: ``search/urls.py`` (``course_list_search``, replaced by
+  ``catalog_search``), ``search/views.py`` (``course_list_search`` →
+  ``_course_discovery``),
   ``search/api.py`` (``course_discovery_search``,
   ``DEFAULT_FILTER_FIELDS``), ``search/search_engine_base.py``
   (``SearchEngine``, single-index abstraction), and the engine modules
