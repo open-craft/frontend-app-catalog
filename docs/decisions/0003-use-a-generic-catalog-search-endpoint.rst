@@ -1,14 +1,13 @@
-========================================
 3. Use a Generic Catalog Search Endpoint
-========================================
+########################################
 
 Status
-------
+******
 
 Proposed
 
 Context
--------
+*******
 
 The catalog (course list / explore) page currently shows courses only. The
 product requires pathways alongside courses in the same catalog experience:
@@ -22,7 +21,7 @@ and mixed results, new ``type`` values, or course-only fields becoming
 optional could break them.
 
 Decision
---------
+********
 
 Keep ``/search/unstable/v0/course_list_search/`` exactly as it is. Its
 existing consumer contract and the shared legacy internals it relies on stay
@@ -47,10 +46,10 @@ with the same observable contract, and must use a separate API/view path
 rather than the course-specific ``course_discovery_search`` semantics.
 
 Endpoint contract
-~~~~~~~~~~~~~~~~~
+=================
 
 Request
-^^^^^^^
+-------
 
 The endpoint keeps the existing POST form conventions:
 
@@ -65,7 +64,7 @@ are ignored. ``enable_course_sorting_by_start_date`` is not part of the
 contract: the endpoint tolerates and ignores it, and the frontend removes it.
 
 Ordering
-^^^^^^^^
+--------
 
 * With a search string: backend relevance, descending.
 * Without a search string: backend-defined catalog ranking.
@@ -76,14 +75,14 @@ apply the tiebreak must add that capability. There is one ``total`` and
 backend pagination.
 
 Search fields
-^^^^^^^^^^^^^
+-------------
 
 ``content.display_name`` and ``org`` are the shared baseline search fields
 for both result types. Type-specific text fields are searched only with
 deliberately comparable weighting.
 
 Response envelope
-^^^^^^^^^^^^^^^^^
+-----------------
 
 A successful response preserves the existing snake_case envelope: ``took``,
 ``total``, ``max_score``, ``aggs``, ``results``. Each result is an
@@ -97,19 +96,19 @@ Legacy ``_id``/``_index``/``_type``, a ``title`` field, and per-hit scores
 are omitted. The frontend may camelCase wire data.
 
 Errors
-^^^^^^
+------
 
 * 400 with ``{"error": string}`` for invalid requests.
 * 500 for backend or data-integrity failures.
 
 Result type
-^^^^^^^^^^^
+-----------
 
 ``result.type`` is solely the entity/rendering discriminator. There is no
 separate type filter.
 
 Categories
-^^^^^^^^^^
+----------
 
 ``category`` is normalized at indexing time and is the sole Categories facet
 and filter.
@@ -123,7 +122,7 @@ and filter.
   them.
 
 Category registry
-^^^^^^^^^^^^^^^^^
+-----------------
 
 A backend registry owns the slug → default-language label mapping and an
 optional category color pair. When present, both colors are canonical
@@ -139,7 +138,7 @@ slug unknown to the registry is a data-integrity error: log/alert and fail
 the response.
 
 Facets
-^^^^^^
+------
 
 Exactly four facets: ``category``, ``org``, ``language``, ``modes``.
 
@@ -150,7 +149,7 @@ Exactly four facets: ``category``, ``org``, ``language``, ``modes``.
 * No date-derived facets.
 
 Payloads
-^^^^^^^^
+--------
 
 Minimum pathway data: ``org``, ``item_count``, ``category``,
 ``category_label``, and ``content.display_name``. Optional: ``image_url``,
@@ -160,21 +159,21 @@ Courses retain the existing ``CourseData`` shape. ``category`` is indexed for
 the facet but is not added to course response ``data`` unless needed.
 
 Category filter UX
-^^^^^^^^^^^^^^^^^^
+------------------
 
 No generic "Pathway" bucket or all-pathways type filter. Bootcamp, tutorial,
 and similar are sibling categories. Category labels come from the registry
 (default language).
 
 Frontend cutover
-^^^^^^^^^^^^^^^^
+----------------
 
 * Switch the request URL, remove the sort flag and the ``_doc``
   compatibility arm after cutover, and support the new app result shape,
   labels, and category field names.
 
 Unresolved backend assumptions (keep ADR Proposed)
---------------------------------------------------
+**************************************************
 
 These backend questions must be resolved before accepting the ADR:
 
@@ -191,7 +190,7 @@ The ADR remains Proposed because these questions affect which documents may
 safely appear in search results.
 
 Alternatives considered
------------------------
+***********************
 
 * **Mutate the legacy endpoint.** Rejected: breaks the existing consumer
   contract.
@@ -204,7 +203,7 @@ Alternatives considered
   facets; legacy untouched.
 
 Consequences
-------------
+************
 
 Positive:
 
@@ -225,7 +224,7 @@ Negative:
   dependency.
 
 Acceptance checks
------------------
+*****************
 
 Same contract matrix across all supported engines:
 
@@ -238,7 +237,7 @@ Same contract matrix across all supported engines:
 * Access leakage behavior, once defined.
 
 References
-----------
+**********
 
 * edx-search: ``search/urls.py`` (``course_list_search``),
   ``search/views.py`` (``course_list_search`` → ``_course_discovery``),
