@@ -106,12 +106,6 @@ Errors
 * 400 with ``{"error": string}`` for invalid requests.
 * 500 for backend or data-integrity failures.
 
-Result type
------------
-
-``result.type`` is solely the entity/rendering discriminator. There is no
-separate type filter.
-
 Categories
 ----------
 
