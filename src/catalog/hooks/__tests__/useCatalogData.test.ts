@@ -1,10 +1,10 @@
 import { renderHook } from '@testing-library/react';
-import { mockCatalogListSearchResponse } from '@src/__mocks__';
+import { mockCatalogSearchResponse } from '@src/__mocks__';
 import { useCatalogData } from '../useCatalogData';
 
 const mockCourseData = {
-  ...mockCatalogListSearchResponse,
-  results: mockCatalogListSearchResponse.results.map(result => ({
+  ...mockCatalogSearchResponse,
+  results: mockCatalogSearchResponse.results.map(result => ({
     ...result,
     title: result.data.content.displayName,
   })),

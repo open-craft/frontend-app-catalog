@@ -1,15 +1,15 @@
 import { MemoryRouter } from 'react-router-dom';
 
 import { act, renderHook } from '@testing-library/react';
-import { DEFAULT_PAGE_INDEX, DEFAULT_PAGE_SIZE } from '@src/data/catalog-list-search/constants';
-import { mockCatalogListSearchResponse } from '@src/__mocks__';
+import { DEFAULT_PAGE_INDEX, DEFAULT_PAGE_SIZE } from '@src/data/catalog-search/constants';
+import { mockCatalogSearchResponse } from '@src/__mocks__';
 import { useCatalog } from '../useCatalog';
 
 const mockFetchData = jest.fn();
 
 const mockCourseData = {
-  ...mockCatalogListSearchResponse,
-  results: mockCatalogListSearchResponse.results.map(result => ({
+  ...mockCatalogSearchResponse,
+  results: mockCatalogSearchResponse.results.map(result => ({
     ...result,
     title: result.data.content.displayName,
   })),

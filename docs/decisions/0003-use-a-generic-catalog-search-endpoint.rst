@@ -254,5 +254,5 @@ References
   (``SearchEngine``, single-index abstraction), and the engine modules
   (``search/elastic.py``, ``search/meilisearch.py``,
   ``search/typesense.py``).
-* This repo: ``src/data/catalog-list-search/urls.ts`` (endpoint URL) and
-  ``src/data/catalog-list-search/api.ts`` (request form data, sort flag).
+* This repo: ``src/data/catalog-search/urls.ts`` (endpoint URL) and
+  ``src/data/catalog-search/api.ts`` (request form data, sort flag).

@@ -6,9 +6,9 @@ import {
 } from '@openedx/paragon';
 import { useNavigate } from 'react-router';
 
-import { useCatalogListSearch } from '@src/data/catalog-list-search/hooks';
+import { useCatalogSearch } from '@src/data/catalog-search/hooks';
 import { AlertNotification } from '@src/generic';
-import { DEFAULT_PAGE_INDEX } from '@src/data/catalog-list-search/constants';
+import { DEFAULT_PAGE_INDEX } from '@src/data/catalog-search/constants';
 import HomeCourseCardSlot from '@src/slots/HomeCourseCardSlot';
 import { LoaderSlot } from '@src/slots/LoaderSlot';
 import { appId, coursesRole } from '@src/constants';
@@ -31,7 +31,7 @@ const CoursesList = () => {
     data: catalogData,
     isLoading: isCoursesLoading,
     isError: isCoursesError,
-  } = useCatalogListSearch({
+  } = useCatalogSearch({
     pageSize: maxCourses,
     pageIndex: DEFAULT_PAGE_INDEX,
     enableCourseSortingByStartDate: getAppConfig(appId).ENABLE_COURSE_SORTING_BY_START_DATE === true,

@@ -1,17 +1,17 @@
 import { useSearchParams } from 'react-router-dom';
 
-import type { CourseListSearchResponse, DataTableParams } from '@src/data/catalog-list-search/types';
+import type { CatalogSearchResponse, DataTableParams } from '@src/data/catalog-search/types';
 
 export interface UseCatalogProps {
   fetchData: (params: DataTableParams) => void;
-  catalogData: CourseListSearchResponse | undefined;
+  catalogData: CatalogSearchResponse | undefined;
   isFetching: boolean;
   searchParams: ReturnType<typeof useSearchParams>[0];
   setSearchParams: ReturnType<typeof useSearchParams>[1];
 }
 
 export interface UseCatalogDataProps {
-  catalogData: CourseListSearchResponse | undefined;
+  catalogData: CatalogSearchResponse | undefined;
   searchString: string;
 }
 

@@ -7,8 +7,8 @@ import { getAppConfig, IntlProvider } from '@openedx/frontend-base';
 
 import catalogApp from '@src/app';
 import { appId } from '@src/constants';
-import { mockCatalogListSearchResponse } from '@src/__mocks__';
-import { useCatalogListSearch } from '@src/data/catalog-list-search/hooks';
+import { mockCatalogSearchResponse } from '@src/__mocks__';
+import { useCatalogSearch } from '@src/data/catalog-search/hooks';
 import { DEFAULT_COURSES_COUNT } from '@src/home/constants';
 import ActualCoursesList from './CoursesList';
 
@@ -30,14 +30,14 @@ jest.mock('react-router', () => ({
   useNavigate: jest.fn(),
 }));
 
-jest.mock('@src/data/catalog-list-search/hooks', () => ({
-  useCatalogListSearch: jest.fn(),
+jest.mock('@src/data/catalog-search/hooks', () => ({
+  useCatalogSearch: jest.fn(),
 }));
 
 const { getAppConfig: actualGetAppConfig } = jest.requireActual('@openedx/frontend-base');
 const mockedGetAppConfig = getAppConfig as jest.Mock;
 const mockedUseNavigate = useNavigate as jest.Mock;
-const mockUseCatalogListSearch = useCatalogListSearch as jest.Mock;
+const mockUseCatalogSearch = useCatalogSearch as jest.Mock;
 
 const CoursesList = () => (
   <IntlProvider locale="en"><MemoryRouter><ActualCoursesList /></MemoryRouter></IntlProvider>
@@ -55,7 +55,7 @@ afterEach(() => {
 
 describe('<CoursesList />', () => {
   it('shows loading state', () => {
-    mockUseCatalogListSearch.mockReturnValue({
+    mockUseCatalogSearch.mockReturnValue({
       isLoading: true,
       isError: false,
       data: null,
@@ -67,7 +67,7 @@ describe('<CoursesList />', () => {
   });
 
   it('shows correct number of skeleton cards based on max courses config', () => {
-    mockUseCatalogListSearch.mockReturnValue({
+    mockUseCatalogSearch.mockReturnValue({
       isLoading: true,
       isError: false,
       data: null,
@@ -87,7 +87,7 @@ describe('<CoursesList />', () => {
   });
 
   it('shows the app default number of skeleton cards when the site configures nothing', () => {
-    mockUseCatalogListSearch.mockReturnValue({
+    mockUseCatalogSearch.mockReturnValue({
       isLoading: true,
       isError: false,
       data: null,
@@ -106,7 +106,7 @@ describe('<CoursesList />', () => {
   });
 
   it('falls back to the app default when the site configures a null max', () => {
-    mockUseCatalogListSearch.mockReturnValue({
+    mockUseCatalogSearch.mockReturnValue({
       isLoading: true,
       isError: false,
       data: null,
@@ -119,18 +119,18 @@ describe('<CoursesList />', () => {
 
     render(<CoursesList />);
 
-    expect(mockUseCatalogListSearch).toHaveBeenCalledWith(
+    expect(mockUseCatalogSearch).toHaveBeenCalledWith(
       expect.objectContaining({ pageSize: DEFAULT_COURSES_COUNT }),
     );
     expect(screen.getAllByTestId('course-card')).toHaveLength(DEFAULT_COURSES_COUNT);
   });
 
   it('shows empty courses state', () => {
-    mockUseCatalogListSearch.mockReturnValue({
+    mockUseCatalogSearch.mockReturnValue({
       isLoading: false,
       isError: false,
       data: {
-        ...mockCatalogListSearchResponse,
+        ...mockCatalogSearchResponse,
         results: [],
       },
     });
@@ -142,14 +142,14 @@ describe('<CoursesList />', () => {
   });
 
   it('displays courses when data is available', () => {
-    mockUseCatalogListSearch.mockReturnValue({
+    mockUseCatalogSearch.mockReturnValue({
       isLoading: false,
       isError: false,
-      data: mockCatalogListSearchResponse,
+      data: mockCatalogSearchResponse,
     });
 
     render(<CoursesList />);
-    mockCatalogListSearchResponse.results.forEach(course => {
+    mockCatalogSearchResponse.results.forEach(course => {
       expect(screen.getByText(course.data.content.displayName)).toBeInTheDocument();
     });
   });
@@ -158,10 +158,10 @@ describe('<CoursesList />', () => {
     const mockNavigate = jest.fn();
     mockedUseNavigate.mockReturnValue(mockNavigate);
 
-    mockUseCatalogListSearch.mockReturnValue({
+    mockUseCatalogSearch.mockReturnValue({
       isLoading: false,
       isError: false,
-      data: mockCatalogListSearchResponse,
+      data: mockCatalogSearchResponse,
     });
 
     mockedGetAppConfig.mockReturnValue({
@@ -178,10 +178,10 @@ describe('<CoursesList />', () => {
   });
 
   it('does not show "View All Courses" button when courses ≤ max', () => {
-    mockUseCatalogListSearch.mockReturnValue({
+    mockUseCatalogSearch.mockReturnValue({
       isLoading: false,
       isError: false,
-      data: mockCatalogListSearchResponse,
+      data: mockCatalogSearchResponse,
     });
 
     mockedGetAppConfig.mockReturnValue({
@@ -194,7 +194,7 @@ describe('<CoursesList />', () => {
   });
 
   it('shows error state when courses loading fails', () => {
-    mockUseCatalogListSearch.mockReturnValue({
+    mockUseCatalogSearch.mockReturnValue({
       isLoading: false,
       isError: true,
       data: null,
@@ -212,10 +212,10 @@ describe('<CoursesList />', () => {
   });
 
   it('returns null when NON_BROWSABLE_COURSES is enabled', () => {
-    mockUseCatalogListSearch.mockReturnValue({
+    mockUseCatalogSearch.mockReturnValue({
       isLoading: false,
       isError: false,
-      data: mockCatalogListSearchResponse,
+      data: mockCatalogSearchResponse,
     });
 
     mockedGetAppConfig.mockReturnValue({

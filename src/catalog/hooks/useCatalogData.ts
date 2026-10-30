@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import type { CourseListSearchResponse } from '@src/data/catalog-list-search/types';
+import type { CatalogSearchResponse } from '@src/data/catalog-search/types';
 import type { UseCatalogDataProps } from './types';
 
 /**
@@ -14,7 +14,7 @@ export const useCatalogData = ({
   catalogData,
   searchString,
 }: UseCatalogDataProps) => {
-  const [previousCatalogData, setPreviousCatalogData] = useState<CourseListSearchResponse | null>(null);
+  const [previousCatalogData, setPreviousCatalogData] = useState<CatalogSearchResponse | null>(null);
 
   /**
    * Handles catalog data state changes.

@@ -1,7 +1,7 @@
 import { addFiltersToFormData, transformDataTableFilters } from '../utils';
 import type { DataTableFilter } from '../types';
 
-describe('catalog-list-search utils', () => {
+describe('catalog-search utils', () => {
   describe('addFiltersToFormData', () => {
     let formData: FormData;
 
