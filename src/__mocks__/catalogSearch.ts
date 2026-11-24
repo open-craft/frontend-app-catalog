@@ -5,7 +5,7 @@ export const mockCourseResults: Course[] = [
   {
     id: 'course-v1:OpenEdx+123+2023',
     index: 'course_info',
-    type: '_doc',
+    type: 'course',
     data: {
       id: 'course-v1:OpenEdx+123+2023',
       course: 'course-v1:OpenEdx+123+2023',
@@ -30,7 +30,7 @@ export const mockCourseResults: Course[] = [
   {
     id: 'course-v1:OpenEdx+123+2024',
     index: 'course_info',
-    type: '_doc',
+    type: 'course',
     data: {
       id: 'course-v1:OpenEdx+123+2024',
       course: 'course-v1:OpenEdx+123+2024',
@@ -55,7 +55,7 @@ export const mockCourseResults: Course[] = [
   {
     id: 'course-v1:dev+654+2024',
     index: 'course_info',
-    type: '_doc',
+    type: 'course',
     data: {
       id: 'course-v1:dev+654+2024',
       course: 'course-v1:dev+654+2024',

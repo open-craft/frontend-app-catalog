@@ -2,7 +2,7 @@ import type { Course } from '@src/generic/course-card/types';
 
 export const mockCourseResponse: Course = {
   id: 'course-v1:edX+DemoX+Demo_Course',
-  type: '_doc',
+  type: 'course',
   data: {
     id: 'course-v1:edX+DemoX+Demo_Course',
     course: 'Demo Course',

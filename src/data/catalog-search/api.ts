@@ -39,6 +39,15 @@ const normalizeCatalogSearchResponse = (data: any): CatalogSearchResponse => {
     );
   }
 
+  if (normalized.results) {
+    // The legacy engine returns `_doc` for courses. Normalize the type so
+    // callers can check `type === 'course'` instead of `!== 'pathway'`.
+    normalized.results = normalized.results.map((result: { type?: string }) => ({
+      ...result,
+      type: result.type === 'pathway' ? 'pathway' : 'course',
+    }));
+  }
+
   return normalized;
 };
 
