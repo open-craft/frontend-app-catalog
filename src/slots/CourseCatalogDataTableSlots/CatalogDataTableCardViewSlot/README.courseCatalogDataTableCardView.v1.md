@@ -99,7 +99,7 @@ Add the following to your site config to replace the card view with a custom 2-c
 -import { catalogApp } from './src';
 +import { catalogApp, type CourseCatalogDataTableCardViewSlotProps } from './src';
 
-+import CatalogDataTableCourseCardSlot from '@src/slots/CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot';
++import CatalogDataTableCourseCardSlot from '@src/slots/CourseCatalogDataTableSlots/CatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot';
 +
  import '@openedx/frontend-base/shell/style';
 
