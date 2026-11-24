@@ -2,8 +2,9 @@
 
 ### Slot ID: `org.openedx.frontend.slot.catalog.catalogDataTable.v1`
 
-> [!WARNING]
-> `org.openedx.frontend.slot.catalog.courseCatalogDataTable.v1` is deprecated and will be removed in a future release. Use `org.openedx.frontend.slot.catalog.catalogDataTable.v1` instead. The deprecated id still receives `CourseListSearchResponse` with `totalCourses`, and renders the course-only table.
+> **Deprecated id:** `org.openedx.frontend.slot.catalog.catalogDataTable.v1` is still rendered for compatibility. It still receives a course-only `CourseListSearchResponse` with `totalCourses`. New code should use the id above.
+
+> **Previous documentation:** [README.catalogDataTable.v1.md](./README.catalogDataTable.v1.md).
 
 ### Slot Props
 
@@ -51,7 +52,7 @@ To keep the default content but wrap it in extra markup, replace the slot's **la
        ...catalogApp,
 +      slots: [
 +        {
-+          slotId: 'org.openedx.frontend.slot.catalog.courseCatalogDataTable.v1',
++          slotId: 'org.openedx.frontend.slot.catalog.catalogDataTable.v1',
 +          op: LayoutOperationTypes.REPLACE,
 +          component: BorderedLayout,
 +        },
@@ -65,7 +66,7 @@ To keep the default content but wrap it in extra markup, replace the slot's **la
 
 ![📊 in Course catalog page data table slot](./images/screenshot_custom_simple.png)
 
-Add the following to your site config to replace the Course catalog data table entirely (in this case with a centered "📊" `h1` tag).
+Add the following to your site config to replace the Catalog data table entirely (in this case with a centered "📊" `h1` tag).
 
 ```diff
 -import { EnvironmentTypes, SiteConfig, ... } from '@openedx/frontend-base';
@@ -79,8 +80,8 @@ Add the following to your site config to replace the Course catalog data table e
        ...catalogApp,
 +      slots: [
 +        {
-+          slotId: 'org.openedx.frontend.slot.catalog.courseCatalogDataTable.v1',
-+          id: 'customCourseCatalogDataTable',
++          slotId: 'org.openedx.frontend.slot.catalog.catalogDataTable.v1',
++          id: 'customCatalogDataTable',
 +          op: WidgetOperationTypes.REPLACE,
 +          relatedId: 'defaultContent',
 +          element: <h1 style={{ textAlign: 'center' }}>📖</h1>,
@@ -95,14 +96,14 @@ Add the following to your site config to replace the Course catalog data table e
 
 ![Custom data table with a stats panel above the CardView](./images/screenshot_custom_with_props.png)
 
-Add the following to your site config to replace the Course catalog data table with a custom component that displays a stats panel (totals, current page, aggregation counts) above a `CardView`-rendered course list. The diff below is against this app's `site.config.dev.tsx`.
+Add the following to your site config to replace the Catalog data table with a custom component that displays a stats panel (totals, current page, aggregation counts) above a `CardView`-rendered course list. The diff below is against this app's `site.config.dev.tsx`.
 
 ```diff
 -import { EnvironmentTypes, SiteConfig, ... } from '@openedx/frontend-base';
 +import { EnvironmentTypes, WidgetOperationTypes, SiteConfig, ... } from '@openedx/frontend-base';
 
 -import { catalogApp } from './src';
-+import { catalogApp, type CourseCatalogDataTableSlotProps } from './src';
++import { catalogApp, type CatalogDataTableSlotProps } from './src';
 
 +import { useState } from 'react';
 +import { DataTable, TextFilter, CardView, Alert, Stack, Chip, Badge } from '@openedx/paragon';
@@ -114,14 +115,14 @@ Add the following to your site config to replace the Course catalog data table w
 
 +const customDataTable = ({
 +  displayData,
-+  totalCourses,
++  totalItems,
 +  pageCount,
 +  pageIndex,
 +  tableColumns,
 +  handleFetchData,
-+}: CourseCatalogDataTableSlotProps) => {
++}: CatalogDataTableSlotProps) => {
 +  const coursesCount = displayData?.results?.length ?? 0;
-+  const total = displayData?.total ?? totalCourses;
++  const total = displayData?.total ?? totalItems;
 +  const currentPage = pageIndex + 1;
 +  const aggs = displayData?.aggs;
 +  const orgCount = aggs?.org?.terms ? Object.keys(aggs.org.terms).length : 0;
@@ -177,8 +178,8 @@ Add the following to your site config to replace the Course catalog data table w
        ...catalogApp,
 +      slots: [
 +        {
-+          slotId: 'org.openedx.frontend.slot.catalog.courseCatalogDataTable.v1',
-+          id: 'customCourseCatalogDataTable',
++          slotId: 'org.openedx.frontend.slot.catalog.catalogDataTable.v1',
++          id: 'customCatalogDataTable',
 +          op: WidgetOperationTypes.REPLACE,
 +          relatedId: 'defaultContent',
 +          component: customDataTable,

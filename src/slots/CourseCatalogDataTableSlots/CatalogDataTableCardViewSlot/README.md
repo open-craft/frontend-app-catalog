@@ -2,8 +2,9 @@
 
 ### Slot ID: `org.openedx.frontend.slot.catalog.catalogDataTableCardView.v1`
 
-> [!WARNING]
-> `org.openedx.frontend.slot.catalog.courseCatalogDataTableCardView.v1` is deprecated and will be removed in a future release. Use `org.openedx.frontend.slot.catalog.catalogDataTableCardView.v1` instead. The deprecated id still receives `CourseListSearchResponse`, which contains course rows only.
+> **Deprecated id:** `org.openedx.frontend.slot.catalog.catalogDataTableCardView.v1` is still rendered for compatibility. It still receives a course-only `CourseListSearchResponse`. New code should use the id above.
+
+> **Previous documentation:** [README.catalogDataTableCardView.v1.md](./README.catalogDataTableCardView.v1.md).
 
 ### Slot Props
 
@@ -46,7 +47,7 @@ To keep the default content but wrap it in extra markup, replace the slot's **la
        ...catalogApp,
 +      slots: [
 +        {
-+          slotId: 'org.openedx.frontend.slot.catalog.courseCatalogDataTableCardView.v1',
++          slotId: 'org.openedx.frontend.slot.catalog.catalogDataTableCardView.v1',
 +          op: LayoutOperationTypes.REPLACE,
 +          component: BorderedLayout,
 +        },
@@ -74,8 +75,8 @@ Add the following to your site config to replace the card view entirely (in this
        ...catalogApp,
 +      slots: [
 +        {
-+          slotId: 'org.openedx.frontend.slot.catalog.courseCatalogDataTableCardView.v1',
-+          id: 'customCourseCatalogDataTableCardView',
++          slotId: 'org.openedx.frontend.slot.catalog.catalogDataTableCardView.v1',
++          id: 'customCatalogDataTableCardView',
 +          op: WidgetOperationTypes.REPLACE,
 +          relatedId: 'defaultContent',
 +          element: <h1 style={{ textAlign: 'center' }}>📇</h1>,
@@ -97,13 +98,13 @@ Add the following to your site config to replace the card view with a custom 2-c
 +import { EnvironmentTypes, WidgetOperationTypes, SiteConfig, ... } from '@openedx/frontend-base';
 
 -import { catalogApp } from './src';
-+import { catalogApp, type CourseCatalogDataTableCardViewSlotProps } from './src';
++import { catalogApp, type CatalogDataTableCardViewSlotProps } from './src';
 
-+import CatalogDataTableCourseCardSlot from '@src/slots/CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot';
++import CatalogDataTableCourseCardSlot from '@src/slots/CourseCatalogDataTableSlots/CatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot';
 +
  import '@openedx/frontend-base/shell/style';
 
-+const customCardView = ({ displayData }: CourseCatalogDataTableCardViewSlotProps) => {
++const customCardView = ({ displayData }: CatalogDataTableCardViewSlotProps) => {
 +  if (!displayData?.results) { return null; }
 +  return (
 +    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem' }}>
@@ -126,8 +127,8 @@ Add the following to your site config to replace the card view with a custom 2-c
        ...catalogApp,
 +      slots: [
 +        {
-+          slotId: 'org.openedx.frontend.slot.catalog.courseCatalogDataTableCardView.v1',
-+          id: 'customCourseCatalogDataTableCardView',
++          slotId: 'org.openedx.frontend.slot.catalog.catalogDataTableCardView.v1',
++          id: 'customCatalogDataTableCardView',
 +          op: WidgetOperationTypes.REPLACE,
 +          relatedId: 'defaultContent',
 +          component: customCardView,
