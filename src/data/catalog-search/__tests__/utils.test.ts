@@ -133,7 +133,7 @@ describe('catalog-search utils', () => {
       expect(toCourseResponse(undefined)).toBeUndefined();
     });
 
-    it('keeps course rows and restores the legacy fields', () => {
+    it('keeps course rows and drops pathway rows', () => {
       const response = {
         took: 1,
         total: 2,
@@ -176,9 +176,9 @@ describe('catalog-search utils', () => {
       const result = toCourseResponse(response);
 
       expect(result?.results).toHaveLength(1);
+      expect(result?.results[0]).toBe(response.results[0]);
       expect(result?.results[0]).toMatchObject({
         id: 'course-v1:dev+1+2026',
-        title: 'Course one',
         index: 'course_info',
         type: 'course',
       });
