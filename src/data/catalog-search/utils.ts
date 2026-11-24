@@ -1,4 +1,5 @@
-import type { DataTableFilter } from './types';
+import type { CatalogSearchResponse, CourseListSearchResponse, DataTableFilter } from './types';
+import type { Course } from '@src/generic/course-card/types';
 
 /**
  * Checks if a value is valid.
@@ -53,4 +54,29 @@ export const transformDataTableFilters = (
   return Object.fromEntries(
     Object.entries(grouped).map(([id, set]) => [id, Array.from(set)]),
   );
+};
+
+/**
+ * Narrows a mixed response to the course-only shape the pre-pathway slots
+ * received. Pathway rows are dropped and course rows get the legacy `index`
+ * and `title` fields back, so widgets written against the old contract keep
+ * compiling and rendering.
+ */
+export const toCourseResponse = (
+  data?: CatalogSearchResponse,
+): CourseListSearchResponse | undefined => {
+  if (!data) {
+    return undefined;
+  }
+
+  return {
+    ...data,
+    results: data.results
+      .filter((result): result is Course => result.type === 'course')
+      .map((course) => ({
+        ...course,
+        index: course.index ?? '',
+        title: course.data.content.displayName,
+      })),
+  };
 };

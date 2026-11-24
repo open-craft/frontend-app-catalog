@@ -1,5 +1,5 @@
-import { addFiltersToFormData, transformDataTableFilters } from '../utils';
-import type { DataTableFilter } from '../types';
+import { addFiltersToFormData, toCourseResponse, transformDataTableFilters } from '../utils';
+import type { CatalogSearchResponse, DataTableFilter } from '../types';
 
 describe('catalog-search utils', () => {
   describe('addFiltersToFormData', () => {
@@ -125,6 +125,63 @@ describe('catalog-search utils', () => {
       expect(result.org).toContain('mit');
 
       expect(result.modes).toEqual(['audit', 'verified']);
+    });
+  });
+
+  describe('toCourseResponse', () => {
+    it('returns undefined when there is no response', () => {
+      expect(toCourseResponse(undefined)).toBeUndefined();
+    });
+
+    it('keeps course rows and restores the legacy fields', () => {
+      const response = {
+        took: 1,
+        total: 2,
+        maxScore: 1,
+        aggs: {},
+        results: [
+          {
+            id: 'course-v1:dev+1+2026',
+            index: 'course_info',
+            type: 'course',
+            data: {
+              id: 'course-v1:dev+1+2026',
+              course: 'course-v1:dev+1+2026',
+              start: '2026-01-01T00:00:00Z',
+              imageUrl: '/course.jpg',
+              org: 'dev',
+              content: { displayName: 'Course one', number: '1' },
+              number: '1',
+              modes: ['audit'],
+              language: 'en',
+              catalogVisibility: 'both',
+            },
+          },
+          {
+            id: 'pathway-1',
+            type: 'pathway',
+            data: {
+              org: 'dev',
+              itemCount: 2,
+              content: { displayName: 'Pathway one' },
+              category: 'bootcamp',
+              categoryLabel: 'Bootcamp',
+              categoryBackgroundColor: '#000000',
+              categoryTextColor: '#ffffff',
+            },
+          },
+        ],
+      } as CatalogSearchResponse;
+
+      const result = toCourseResponse(response);
+
+      expect(result?.results).toHaveLength(1);
+      expect(result?.results[0]).toMatchObject({
+        id: 'course-v1:dev+1+2026',
+        title: 'Course one',
+        index: 'course_info',
+        type: 'course',
+      });
     });
   });
 });

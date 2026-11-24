@@ -1,14 +1,17 @@
-# Course Catalog Data Table Card View Slot
+# Catalog Data Table Card View Slot
 
-### Slot ID: `org.openedx.frontend.slot.catalog.courseCatalogDataTableCardView.v1`
+### Slot ID: `org.openedx.frontend.slot.catalog.catalogDataTableCardView.v1`
+
+> [!WARNING]
+> `org.openedx.frontend.slot.catalog.courseCatalogDataTableCardView.v1` is deprecated and will be removed in a future release. Use `org.openedx.frontend.slot.catalog.catalogDataTableCardView.v1` instead. The deprecated id still receives `CourseListSearchResponse`, which contains course rows only.
 
 ### Slot Props
 
-* `displayData?: CatalogSearchResponse` — the catalog search response (results, total count, aggregations, and other metadata).
+* `displayData?: CatalogSearchResponse` — the catalog search response, which can mix course and pathway results (results, total count, aggregations, and other metadata).
 
 ## Description
 
-This slot is used to replace/modify/hide the entire Course catalog page data table card view section.
+This slot is used to replace/modify/hide the entire Catalog page data table card view section.
 
 ## Examples
 

@@ -28,10 +28,12 @@ for naming conventions and lifecycle details.
 - [`org.openedx.frontend.slot.catalog.catalogIntro.v1`](./CatalogIntroSlot/)
 - [`org.openedx.frontend.slot.catalog.courseCatalogIntro.v1`](./CatalogIntroSlot/README.courseCatalogIntro.v1.md) (deprecated)
 - [`org.openedx.frontend.slot.catalog.catalogSearchField.v1`](./CatalogSearchFieldSlot/)
-- [`org.openedx.frontend.slot.catalog.courseCatalogDataTable.v1`](./CourseCatalogDataTableSlots/CourseCatalogDataTableSlot/)
+- [`org.openedx.frontend.slot.catalog.catalogDataTable.v1`](./CourseCatalogDataTableSlots/CatalogDataTableSlot/)
+- [`org.openedx.frontend.slot.catalog.courseCatalogDataTable.v1`](./CourseCatalogDataTableSlots/CatalogDataTableSlot/) (deprecated)
 - [`org.openedx.frontend.slot.catalog.catalogDataTableControlBar.v1`](./CourseCatalogDataTableSlots/CatalogDataTableControlBarSlot/)
-- [`org.openedx.frontend.slot.catalog.courseCatalogDataTableCardView.v1`](./CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot/)
-- [`org.openedx.frontend.slot.catalog.catalogDataTableCourseCard.v1`](./CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot/)
+- [`org.openedx.frontend.slot.catalog.catalogDataTableCardView.v1`](./CourseCatalogDataTableSlots/CatalogDataTableCardViewSlot/)
+- [`org.openedx.frontend.slot.catalog.courseCatalogDataTableCardView.v1`](./CourseCatalogDataTableSlots/CatalogDataTableCardViewSlot/) (deprecated)
+- [`org.openedx.frontend.slot.catalog.catalogDataTableCourseCard.v1`](./CourseCatalogDataTableSlots/CatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot/)
 - [`org.openedx.frontend.slot.catalog.catalogDataTableTableFooter.v1`](./CourseCatalogDataTableSlots/CatalogDataTableTableFooterSlot/)
 
 ## Course About page

@@ -10,7 +10,7 @@ import { getStringConfig } from '@src/config';
 import { DEFAULT_PAGE_SIZE } from '@src/data/catalog-search/constants';
 import { useCatalogSearch } from '@src/data/catalog-search/hooks';
 import CatalogIntroSlot from '@src/slots/CatalogIntroSlot';
-import { CourseCatalogDataTableSlot } from '@src/slots/CourseCatalogDataTableSlots';
+import { CatalogDataTableSlot } from '@src/slots/CourseCatalogDataTableSlots';
 import CatalogSearchFieldSlot from '@src/slots/CatalogSearchFieldSlot';
 import { useDebouncedSearchInput } from './hooks/useDebouncedSearchInput';
 import { AlertNotification, Loading } from '../generic';
@@ -112,9 +112,9 @@ const CatalogPage = () => {
               handleSearch={handleSearch}
               initialSearchValue={searchString}
             />
-            <CourseCatalogDataTableSlot
+            <CatalogDataTableSlot
               displayData={displayData}
-              totalCourses={totalItems}
+              totalItems={totalItems}
               pageCount={pageCount}
               pageIndex={pageIndex}
               tableColumns={tableColumns}

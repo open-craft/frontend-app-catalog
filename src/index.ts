@@ -22,14 +22,18 @@ export type {
 export type {
   CatalogSearchFieldSlotProps, CourseCatalogSearchFieldSlotProps,
 } from './slots/CatalogSearchFieldSlot';
-export type { CourseCatalogDataTableSlotProps } from './slots/CourseCatalogDataTableSlots/CourseCatalogDataTableSlot';
+export type {
+  CatalogDataTableSlotProps, CourseCatalogDataTableSlotProps,
+} from './slots/CourseCatalogDataTableSlots/CatalogDataTableSlot';
 export type {
   CatalogDataTableControlBarSlotProps, CourseCatalogDataTableControlBarSlotProps,
 } from './slots/CourseCatalogDataTableSlots/CatalogDataTableControlBarSlot';
-export type { CourseCatalogDataTableCardViewSlotProps } from './slots/CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot';
+export type {
+  CatalogDataTableCardViewSlotProps, CourseCatalogDataTableCardViewSlotProps,
+} from './slots/CourseCatalogDataTableSlots/CatalogDataTableCardViewSlot';
 export type {
   CatalogDataTableCourseCardSlotProps, CourseCatalogDataTableCourseCardSlotProps,
-} from './slots/CourseCatalogDataTableSlots/CourseCatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot';
+} from './slots/CourseCatalogDataTableSlots/CatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot';
 
 export type {
   CatalogSearchParams,
@@ -41,4 +45,4 @@ export type {
 export type {
   TableColumn,
   TableColumnFilterChoice,
-} from './slots/CourseCatalogDataTableSlots/CourseCatalogDataTableSlot';
+} from './slots/CourseCatalogDataTableSlots/CatalogDataTableSlot';

@@ -1,19 +1,22 @@
-# Course Catalog Data Table Slot
+# Catalog Data Table Slot
 
-### Slot ID: `org.openedx.frontend.slot.catalog.courseCatalogDataTable.v1`
+### Slot ID: `org.openedx.frontend.slot.catalog.catalogDataTable.v1`
+
+> [!WARNING]
+> `org.openedx.frontend.slot.catalog.courseCatalogDataTable.v1` is deprecated and will be removed in a future release. Use `org.openedx.frontend.slot.catalog.catalogDataTable.v1` instead. The deprecated id still receives `CourseListSearchResponse` with `totalCourses`, and renders the course-only table.
 
 ### Slot Props
 
-* `displayData?: CatalogSearchResponse` — the catalog search response containing results, total count, aggregations, and other metadata.
-* `totalCourses: number` — the total number of courses available in the catalog.
-* `pageCount: number` — the total number of pages available for pagination, calculated from total courses and page size.
+* `displayData?: CatalogSearchResponse` — the catalog search response containing course and pathway results, total count, aggregations, and other metadata.
+* `totalItems: number` — the total number of results available in the catalog.
+* `pageCount: number` — the total number of pages available for pagination, calculated from total items and page size.
 * `pageIndex: number` — the zero-based index of the currently active page in the table.
 * `tableColumns: TableColumn[]` — column definitions for the table (headers, accessors, filters, filter choices). Generated from course aggregations.
 * `handleFetchData: (params: DataTableParams) => void` — invoke when pagination / sorting / filtering changes so the caller can refetch data.
 
 ## Description
 
-This slot is used to replace/modify/hide the entire Course catalog page data table.
+This slot is used to replace/modify/hide the entire Catalog page data table.
 
 ## Examples
 

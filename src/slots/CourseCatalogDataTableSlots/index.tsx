@@ -1,13 +1,13 @@
-import CourseCatalogDataTableSlot from './CourseCatalogDataTableSlot';
+import CatalogDataTableSlot from './CatalogDataTableSlot';
 import CatalogDataTableControlBarSlot from './CatalogDataTableControlBarSlot';
-import CourseCatalogDataTableCardViewSlot from './CourseCatalogDataTableCardViewSlot';
+import CatalogDataTableCardViewSlot from './CatalogDataTableCardViewSlot';
 import CatalogDataTableTableFooterSlot from './CatalogDataTableTableFooterSlot';
-import CatalogDataTableCourseCardSlot from './CourseCatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot';
+import CatalogDataTableCourseCardSlot from './CatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot';
 
 export {
-  CourseCatalogDataTableSlot,
+  CatalogDataTableSlot,
   CatalogDataTableControlBarSlot,
-  CourseCatalogDataTableCardViewSlot,
+  CatalogDataTableCardViewSlot,
   CatalogDataTableTableFooterSlot,
   CatalogDataTableCourseCardSlot,
 };

@@ -1,14 +1,12 @@
-# Course Catalog Data Table Slots
+# Catalog Data Table Slots
 
-Slots for the Course Catalog page's data table (control bar, card view,
-individual course cards, table footer). None have been ported to the
-`Slot` API yet — subdirectory contents are still the placeholder
-`<>{children}</>` shape from the bulk port.
+Slots for the Catalog page's data table (control bar, card view, individual
+course and pathway cards, table footer).
 
-- `CourseCatalogDataTableSlot`
+- `CatalogDataTableSlot` (id `catalogDataTable.v1`, deprecated `courseCatalogDataTable.v1` below it)
 - `CatalogDataTableControlBarSlot`
-- `CourseCatalogDataTableCardViewSlot`
-- `CourseCatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot`
+- `CatalogDataTableCardViewSlot` (id `catalogDataTableCardView.v1`, deprecated `courseCatalogDataTableCardView.v1` below it)
+- `CatalogDataTableCardViewSlot/CatalogDataTableCourseCardSlot`
 - `CatalogDataTableTableFooterSlot`
 
 For the full list of app slots, see [`../README.md`](../).

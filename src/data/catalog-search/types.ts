@@ -60,8 +60,48 @@ export interface DataTableFilter {
   value: string | string[];
 }
 
-/** @deprecated Use `CatalogSearchResponse`. */
-export type CourseListSearchResponse = CatalogSearchResponse;
+/**
+ * Course-only response shape used by the `courseCatalogDataTable.v1` and
+ * `courseCatalogDataTableCardView.v1` slots, which keep the contract they had
+ * before pathways were added.
+ *
+ * @deprecated Use `CatalogSearchResponse` for the mixed course/pathway
+ * response.
+ */
+export interface CourseListSearchResponse {
+  took: number;
+  total: number;
+  results: {
+    id: string;
+    index: string;
+    type: string;
+    title: string;
+    data: {
+      id: string;
+      course: string;
+      start: string;
+      imageUrl: string;
+      org: string;
+      orgImageUrl?: string;
+      advertisedStart?: string;
+      content: {
+        displayName: string;
+        overview?: string;
+        number?: string;
+      };
+      number: string;
+      modes: string[];
+      language: string;
+      catalogVisibility: string;
+    };
+  }[];
+  aggs: Record<string, {
+    terms: Record<string, number>;
+    total: number;
+    other: number;
+  }>;
+  maxScore: number;
+}
 
 /** @deprecated Use `CatalogSearchParams`. */
 export type CourseListSearchParams = CatalogSearchParams;
