@@ -35,6 +35,40 @@ describe('Catalog Search Data Layer', () => {
       expect(result).toEqual(mockCatalogSearchResponse);
     });
 
+    it('should normalize legacy `_doc` course results to `course`', async () => {
+      const mockPost = jest.fn().mockResolvedValue({
+        data: {
+          ...mockCatalogSearchResponse,
+          results: [
+            { ...mockCatalogSearchResponse.results[0], id: 'legacy-course', type: '_doc' },
+            { id: 'pathway-1', type: 'pathway', data: { content: { displayName: 'Pathway' } } },
+          ],
+        },
+      });
+      mockGetAuthenticatedHttpClient.mockReturnValue({ post: mockPost });
+
+      const result = await fetchCatalogSearch({});
+
+      expect(result.results.map((row) => row.type)).toEqual(['course', 'pathway']);
+    });
+
+    it('should keep explicit `course` and `pathway` result types', async () => {
+      const mockPost = jest.fn().mockResolvedValue({
+        data: {
+          ...mockCatalogSearchResponse,
+          results: [
+            { ...mockCatalogSearchResponse.results[0], id: 'course-1', type: 'course' },
+            { id: 'pathway-1', type: 'pathway', data: { content: { displayName: 'Pathway' } } },
+          ],
+        },
+      });
+      mockGetAuthenticatedHttpClient.mockReturnValue({ post: mockPost });
+
+      const result = await fetchCatalogSearch({});
+
+      expect(result.results.map((row) => row.type)).toEqual(['course', 'pathway']);
+    });
+
     it('should fetch catalog search data with custom parameters', async () => {
       const mockPost = jest.fn().mockResolvedValue({ data: mockCatalogSearchResponse });
       mockGetAuthenticatedHttpClient.mockReturnValue({ post: mockPost });
