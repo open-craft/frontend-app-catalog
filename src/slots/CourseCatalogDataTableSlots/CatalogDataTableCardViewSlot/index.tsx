@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { CardView } from '@openedx/paragon';
 import { Slot } from '@openedx/frontend-base';
 
@@ -15,21 +16,25 @@ export interface CourseCatalogDataTableCardViewSlotProps {
   displayData?: CourseListSearchResponse;
 }
 
-const CatalogDataTableCardViewSlot = ({ displayData }: CatalogDataTableCardViewSlotProps) => (
-  <Slot
-    id="org.openedx.frontend.slot.catalog.catalogDataTableCardView.v1"
-    displayData={displayData}
-  >
+const CatalogDataTableCardViewSlot = ({ displayData }: CatalogDataTableCardViewSlotProps) => {
+  const courseDisplayData = useMemo(() => toCourseResponse(displayData), [displayData]);
+
+  return (
     <Slot
-      id="org.openedx.frontend.slot.catalog.courseCatalogDataTableCardView.v1"
-      displayData={toCourseResponse(displayData)}
+      id="org.openedx.frontend.slot.catalog.catalogDataTableCardView.v1"
+      displayData={displayData}
     >
-      <CardView
-        CardComponent={CatalogDataTableCourseCardSlot}
-        skeletonCardCount={Math.min(displayData?.total ?? DEFAULT_PAGE_SIZE, DEFAULT_PAGE_SIZE)}
-      />
+      <Slot
+        id="org.openedx.frontend.slot.catalog.courseCatalogDataTableCardView.v1"
+        displayData={courseDisplayData}
+      >
+        <CardView
+          CardComponent={CatalogDataTableCourseCardSlot}
+          skeletonCardCount={Math.min(displayData?.total ?? DEFAULT_PAGE_SIZE, DEFAULT_PAGE_SIZE)}
+        />
+      </Slot>
     </Slot>
-  </Slot>
-);
+  );
+};
 
 export default CatalogDataTableCardViewSlot;

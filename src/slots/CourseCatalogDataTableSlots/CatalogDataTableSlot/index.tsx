@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   breakpoints, DataTable, useMediaQuery, TextFilter,
 } from '@openedx/paragon';
@@ -58,6 +59,7 @@ const CatalogDataTableSlot = ({
 }: CatalogDataTableSlotProps) => {
   const intl = useIntl();
   const isMedium = useMediaQuery({ maxWidth: breakpoints.large.maxWidth });
+  const courseDisplayData = useMemo(() => toCourseResponse(displayData), [displayData]);
 
   return (
     <Slot
@@ -71,7 +73,7 @@ const CatalogDataTableSlot = ({
     >
       <Slot
         id="org.openedx.frontend.slot.catalog.courseCatalogDataTable.v1"
-        displayData={toCourseResponse(displayData)}
+        displayData={courseDisplayData}
         totalCourses={totalItems}
         pageCount={pageCount}
         pageIndex={pageIndex}
